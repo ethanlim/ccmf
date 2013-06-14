@@ -27,18 +27,16 @@ var ccmf = ccmf || {};
 
 /*
  *  Namespace Creator
- *  @param namespace string
+ *  @param ns_string namespace string
  */
 ccmf.namespace = function (ns_string) {
     'use strict';
     var parts = ns_string.split('.'),
         parent = ccmf,
         i;
-
     if (parts[0] === "ccmf") {
         parts = parts.slice(1);
     }
-
     for (i = 0; i < parts.length; i += 1) {
         // create a property if it doesn't exist
         if (parent[parts[i]] === "undefined") {
@@ -46,7 +44,6 @@ ccmf.namespace = function (ns_string) {
         }
         parent = parent[parts[i]];
     }
-
     return parent;
 };
 
@@ -73,6 +70,12 @@ ccmf.Text.prototype = {
      */
     stopWords : ['to','that','a','for','the','that','have','it','is'],
     
+    /**
+     *  Function that determines if word is a stop word
+     *  @param word input word to be checked
+     *  @method isStopWord
+     *  @return {bool} true/false 
+     */
     isStopWord: function(word){
         'use strict';
         for(var i=0;i<this.stopWords.length;i++){
@@ -85,7 +88,9 @@ ccmf.Text.prototype = {
     /**
      * Extract the shingles based on the characters 
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
-     * @param textual content,k
+     * @param input textual content
+     * @param k     length of shingles (substring)
+     * @method fixedShingles
      * @return the set of shingles
      */
     fixedShingles: function(input,k){
@@ -95,7 +100,9 @@ ccmf.Text.prototype = {
     /**
      * Extract the shingles after removal of stop words
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
-     * @param textual content,k
+     * @param input textual content
+     * @param k     length of shingles (substring)
+     * @method removedStopWordShingles
      * @return the set of shingles
      */
     removedStopWordShingles: function(input,k){
@@ -104,7 +111,8 @@ ccmf.Text.prototype = {
     
     /**
      * Extract Shingles via two words after stop word 
-     * @param textual content
+     * @param input textual content
+     * @method stopMoreShingles
      * @return the set of shingles
      */
     stopMoreShingles: function(input){
