@@ -59,6 +59,19 @@ ccmf.Text = function () {
 };
 
 /**
+ * Text Object Constructor
+ * @param none
+ * @method create
+ * @static
+ * @return {ccmf.Text} The newly created vector.
+ */
+ccmf.Text.create = function () {
+    'use strict';
+    var newObj = new ccmf.Text();
+    return newObj;
+};
+
+/**
  * The Text class prototype
  * @class Text
  * @constructor
@@ -86,15 +99,40 @@ ccmf.Text.prototype = {
     },
     
     /**
+     * Remove the stop words within a textual content
+     * @param Raw Textual Data
+     * @method removeStopWords
+     * @return {string} 
+     */
+    removeStopWords: function(rawText){
+        'use strict';
+        var textArray = rawText.split(' ');
+        for(var i=0;i<textArray.length;i++){
+            if(this.isStopWord(textArray[i])){
+                textArray.splice(i,1);
+            }
+        }
+        return textArray.join(' ');
+    },
+    
+    /**
      * Extract the shingles based on the characters 
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
-     * @param input textual content
+     * Recommended for news articles k = 9 
+     * @param input textual content without white spaces
      * @param k     length of shingles (substring)
      * @method fixedShingles
      * @return the set of shingles
      */
-    fixedShingles: function(input,k){
+    fixedShinglesWithoutWS: function(rawText,k){
         'use strict';
+        var textWithoutWS = rawText.replace(/ /g,'');
+        var shinglesSet = new Array();
+        for(var i=0;i<textWithoutWS.length;i++){
+            if(i+k-1<textWithoutWS.length)
+                shinglesSet.push(textWithoutWS.substr(i,k));   
+        }
+        return shinglesSet;
     },
     
     /**
@@ -105,8 +143,10 @@ ccmf.Text.prototype = {
      * @method removedStopWordShingles
      * @return the set of shingles
      */
-    removedStopWordShingles: function(input,k){
+    removedStopWordShingles: function(rawText,k){
         'use strict';
+        var shinglesSet = this.fixedShinglesWithoutWS(this.removeStopWords(rawText),k);  
+        return shinglesSet;
     },
     
     /**
@@ -115,39 +155,25 @@ ccmf.Text.prototype = {
      * @method stopMoreShingles
      * @return the set of shingles
      */
-    stopMoreShingles: function(input){
+    stopMoreShingles: function(rawText){
         'use strict';
-        var text = input.split(' ');
+        var textArray = rawText.split(' ');
         var shinglesSet=new Array();
-        
-        for(var i=0;i<text.length;i++){
+        for(var i=0;i<textArray.length;i++){
             
-            if(this.isStopWord(text[i])){
-                
+            if(this.isStopWord(textArray[i])){
+            
                 /* Take the next two words and skip them */
-                if(i==text.length-1)
-                    shinglesSet.push(text[i]);
-                else if(i+1==text.length-1)
-                    shinglesSet.push(text[i]+' '+text[i+1]);
+                if(i==textArray.length-1)
+                    shinglesSet.push(textArray[i]);
+                else if(i+1==textArray.length-1)
+                    shinglesSet.push(textArray[i]+' '+textArray[i+1]);
                 else                              
-                    shinglesSet.push(text[i]+' '+text[i+1]+' '+text[i+2]);
+                    shinglesSet.push(textArray[i]+' '+textArray[i+1]+' '+textArray[i+2]);
                
             }
         }
-        
         return shinglesSet;
     }
 };
 
-/**
- * Create a new Text Obj.
- * @param none
- * @method create
- * @static
- * @return {ccmf.Text} The newly created vector.
- */
-ccmf.Text.create = function () {
-    'use strict';
-    var newObj = new ccmf.Text();
-    return newObj;
-};
