@@ -182,9 +182,9 @@ ccmf.Text.prototype = {
     /**
      * Generate the Signature Matrix 
      * Methodology: Theoretical Approach 
-     * @param shingles sets 
-     * @method generateMinHash
-     * @return return the multi-dimenisional array as a signature matrix for a Set S
+     * @param shinglesSet sets 
+     * @method generateSignatureMatrixByTheoreticalMethod
+     * @return shinglesSignatures return the multi-dimenisional array as a signature matrix for a Set S
      * 
      */
      generateSignatureMatrixByTheoreticalMethod: function(shinglesSet){
@@ -233,9 +233,11 @@ ccmf.Text.prototype = {
      },
 
      /**
-      *
-      *
-      *
+      * Generate the Signature Matrix
+      * Methodology: Practical Method
+      * @param shinglesSet
+      * @method generateSignatureMatrixByPracticalMethod
+      * @return shinglesSignatures
       */
      generateSignatureMatrixByPracticalMethod: function(shinglesSet){
          'use strict';
@@ -252,14 +254,9 @@ ccmf.Text.prototype = {
          /* Num of Hash Functions */
          var numOfHashFn = 100;
          
+         //TODO Implement the hash function
+         return shinglesSignatures;
      },
-     
-     
-     simulatePermHashFn: function(){
-         'use strict';
-         
-     },
-     
      
      /**
       *  Permutation of String
