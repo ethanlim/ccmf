@@ -82,6 +82,7 @@ ccmf.Text.prototype = {
      * The set of stop words that would be identified
      */
     stopWords : ['to','that','a','for','the','that','have','it','is'],
+    alphabets : "abcdefghijklmnopqrstuvwxyz",
     
     /**
      *  Function that determines if word is a stop word
@@ -100,7 +101,7 @@ ccmf.Text.prototype = {
     
     /**
      * Remove the stop words within a textual content
-     * @param Raw Textual Data
+     * @param rawText raw textual content
      * @method removeStopWords
      * @return {string} 
      */
@@ -117,9 +118,10 @@ ccmf.Text.prototype = {
     
     /**
      * Extract the shingles based on the characters 
+     * Methodology: extract overlapping k-grams and stemmed
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
      * Recommended for news articles k = 9 
-     * @param input textual content without white spaces
+     * @param rawText raw textual content without white spaces
      * @param k     length of shingles (substring)
      * @method fixedShingles
      * @return the set of shingles
@@ -138,20 +140,21 @@ ccmf.Text.prototype = {
     /**
      * Extract the shingles after removal of stop words
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
-     * @param input textual content
+     * @param rawText raw textual content
      * @param k     length of shingles (substring)
      * @method removedStopWordShingles
      * @return the set of shingles
      */
     removedStopWordShingles: function(rawText,k){
         'use strict';
+        /* After the removal of Stop Words, extract the shingles as usual*/
         var shinglesSet = this.fixedShinglesWithoutWS(this.removeStopWords(rawText),k);  
         return shinglesSet;
     },
     
     /**
      * Extract Shingles via two words after stop word 
-     * @param input textual content
+     * @param rawText raw textual content
      * @method stopMoreShingles
      * @return the set of shingles
      */
@@ -174,6 +177,120 @@ ccmf.Text.prototype = {
             }
         }
         return shinglesSet;
+    },
+    
+    /**
+     * Generate the Signature Matrix 
+     * Methodology: Theoretical Approach 
+     * @param shingles sets 
+     * @method generateMinHash
+     * @return return the multi-dimenisional array as a signature matrix for a Set S
+     * 
+     */
+     generateSignatureMatrixByTheoreticalMethod: function(shinglesSet){
+         'use strict';
+         
+         /* Generate all permutations */
+         var permutations = this.permutationGenerator(this.alphabets);
+         
+         /*  The number of times permutation for extracting signature of each shingles */
+         var timesOfPermutatons = 100;
+         
+         /* Shingles Signatures */
+         var shinglesSignatures = new Array();
+         
+         //TODO: Remove the below array creation for each shingles element
+         for(var i=0;i<shinglesSet.length;i++){
+             shinglesSignatures[i] = new Array();
+         }
+         
+         for(var m=0;m<timesOfPermutatons;m++){
+                
+            /* Pick a random permutation order, P */
+            var randomPermIdx = Math.floor((Math.random()*(permutations.length-1))+0);
+            var randPerm = permutations[randomPermIdx];
+                
+                /* Form each Shingles => S1,S2,S3,... Sn */
+                for(var i=0;i<shinglesSet.length;i++){
+                    
+                /* One Set, S */
+                var shingle = shinglesSet[i];
+               
+                    /* Find the 1st Element in permuted order, P, that exists in shingle, S, */
+                    for(var permIdx = 0;permIdx<randPerm.length;permIdx++){
+
+                        if(shingle.indexOf(randPerm[permIdx])>0){
+                            /* For this permutation, m, determine the hash value */
+                            shinglesSignatures[i][m] = randPerm[permIdx];
+                            break;
+                        }
+                    }
+             
+             }
+            
+         }
+         return shinglesSignatures;
+     },
+
+     /**
+      *
+      *
+      *
+      */
+     generateSignatureMatrixByPracticalMethod: function(shinglesSet){
+         'use strict';
+         
+         /* Skip generation of permutation */
+         
+         var shinglesSignatures = new Array();
+         
+         //TODO: Remove the below array creation for each shingles element
+         for(var i=0;i<shinglesSet.length;i++){
+             shinglesSignatures[i] = new Array();
+         }
+   
+         /* Num of Hash Functions */
+         var numOfHashFn = 100;
+         
+     },
+     
+     
+     simulatePermHashFn: function(){
+         'use strict';
+         
+     },
+     
+     
+     /**
+      *  Permutation of String
+      *  @param set String
+      *  @method permutationGenerator
+      *  @return set of permutations 
+      */
+    permutationGenerator: function(str, index, buffer) {
+        'use strict';
+        if (typeof str == "string")
+            str = str.split("");
+        if (typeof index == "undefined")
+            index = 0;
+        if (typeof buffer == "undefined")
+            buffer = [];
+        if (index >= str.length)
+            return buffer;
+        for (var i = index; i < str.length; i++)
+            buffer.push(this.toggleLetters(str, index, i));
+        return this.permutationGenerator(str, index + 1, buffer);
+    },
+    
+    toggleLetters:function(str, index1, index2) {
+        'use strict';
+        if (index1 != index2) {
+            var temp = str[index1];
+            str[index1] = str[index2];
+            str[index2] = temp;
+        }
+        return str.join("");
     }
+     
 };
 
