@@ -208,12 +208,12 @@ ccmf.Text.prototype = {
      },
     
     /**
-     * Return the MD5 hash for a variable string  
-     * @param string a variable length string
+     * MD5 Hash Function
+     * @param string any variable length string
      * @method MD5
-     * @return 128 bit Hexidecimal hash
-    */
-    MD5: function (string) {
+     * @return 120 bits hexidecimal string
+     */
+     MD5: function (string) {
  
 	function RotateLeft(lValue, iShiftBits) {
 		return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
@@ -413,46 +413,39 @@ ccmf.Text.prototype = {
  
 	return temp.toLowerCase();
     },
-    
-    /**
-     * Generate the Signature Matrix 
-     * Methodology: Theoretical Approach 
-     * @param shinglesSet sets 
-     * @method generateSignatureMatrixByTheoreticalMethod
-     * @return shinglesSignatures return the multi-dimenisional array as a signature matrix for a Set S
-     * 
-     */
-     generateSignatureMatrixByTheoreticalMethod: function(shinglesSet){
-         'use strict';
-         
-     },
-
+     
      /**
-      * Compare two shingles set
-      * Methodology: Practical Method
-      * @param shinglesFingA,shinglesFingB
-      * @method compareTwoSignatures
-      * @return percentage 
-      */
-     compareTwoSignaturesPractical: function(shinglesFingA,shinglesFingB){
+     *  Generate the minHash Signatures for any size of shingles fingerprint set
+     *  @param shinglesFingSet, n  shinglesFingSet : a variable set of shingles n : number of rand hash functions
+     *  @method minHashSignaturesGen
+     *  @return SIG minhash signature matrix
+     */
+     minHashSignaturesGen: function(shinglesFingSet,n){
          'use strict';
          
          var percentage = 0;
          var infinity=1.7976931348623157E+10308;
+         var universalSet = [];
          
-         var universalSet = shinglesFingA.concat(shinglesFingB);
+         var numOfHashFn = n;     
+         var SIG = new Array();
          
-         /* Initialise all elements to infinity */
-         var numOfHashFn = 100
-         var SIGA = new Array();
-         var SIGB = new Array();
-         for(var h=0;h<numOfHashFn;h++){
-             SIGA.push(infinity);   //Sa column
-             SIGB.push(infinity);   //Sb column 
-             //Rows is the h1,h2,h3,h4,h5....
+         for(var shinglesFingPrint=0;shinglesFingPrint<shinglesFingSet.length;shinglesFingPrint++){
+             
+             /* Add all shingles fingerprint to the universal set */
+             universalSet = universalSet.concat(shinglesFingSet[shinglesFingPrint]);
+             
+             /* Initialise all SIC(i,c) to infinity */
+             
+             SIG[shinglesFingPrint] = new Array();
+             
+             for(var h=0;h<numOfHashFn;h++){
+                SIG[shinglesFingPrint].push(infinity); 
+                //Rows is the h1,h2,h3,h4,h5....
+             }
          }
          
-         //Generate 100 hash function
+         //Generate n hash function
          var hashFnArr = this.hashFnGen(numOfHashFn,universalSet.length);
          var hashVal = new Array();
          var hashFn = null;
@@ -461,55 +454,35 @@ ccmf.Text.prototype = {
          
          for(var rows=0;rows<universalSet.length;rows++){
           
+            /* Obtain one element from universal set */
             var uniElem = universalSet[rows];
             hashVal = [];
             
-            /* Compute h1(r),h2(r),h3(r),.... */
+            /* Simulate the permutation       
+             * Compute h1(r),h2(r),h3(r),.... */
             for(hashFn=0;hashFn<hashFnArr.length;hashFn++){
                 hashVal.push(hashFnArr[hashFn](uniElem));
             }
             
-            //If Set A has universal set's element 1 in row r
-            if(shinglesFingA.indexOf(uniElem)>-1){
-             
-                /* If that element from universal is reflected in SetA
-                 * Replace if nececessary 
-                 */
-                for(var i=0;i<SIGA.length;i++){
-                   if(hashVal[i] < SIGA[i]){
-                       SIGA[i]= hashVal[i];
-                   }
+            for(var shinglesFing=0;shinglesFing<shinglesFingSet.length;shinglesFing++){
+                
+                if(shinglesFingSet[shinglesFing].indexOf(uniElem)>-1){
+                    
+                    for(var i=0;i<SIG[shinglesFing].length;i++){
+                        if(hashVal[i] < SIG[shinglesFing][i]){
+                            SIG[shinglesFing][i]= hashVal[i];
+                        }
+                    }
+                    
                 }
-            
+                
             }
             
-            //If Set B has universal set's element
-            if(shinglesFingB.indexOf(uniElem)>-1){
-          
-                for(var i=0;i<SIGB.length;i++){
-                   if(hashVal[i] < SIGB[i]){
-                       SIGB[i]= hashVal[i];
-                   }
-                }
-            
-            }
          }
          
-         /* Determine the ratio of the hash function of SIGA equals to SIGB */ 
-         var SIMCount = 0;
-         for(var rows=0;rows<SIGA.length;rows++){
-             
-             if(SIGA[rows]==SIGB[rows]){
-                 SIMCount++;
-             }
-         }
-         
-         /* Determine the percentage of equal hash value over all the hash value*/
-         percentage = SIMCount/SIGA.length*100;
-         
-         return percentage;
+         return SIG;
      },
-     
+
      /**
       * Random Hash Function Generator 
       * @param k,rowlength k is the number of random hash to generate, row length determines the upper limit if hash value
@@ -539,34 +512,35 @@ ccmf.Text.prototype = {
      },
      
      /**
-      *  Permutation of String
-      *  @param set String
-      *  @method permutationGenerator
-      *  @return set of permutations 
+      * Compare two shingles set
+      * Methodology: Practical Method
+      * @param shinglesFingA,shinglesFingB
+      * @method compareTwoSignatures
+      * @return percentage 
       */
-    permutationGenerator: function(str, index, buffer) {
-        'use strict';
-        if (typeof str == "string")
-            str = str.split("");
-        if (typeof index == "undefined")
-            index = 0;
-        if (typeof buffer == "undefined")
-            buffer = [];
-        if (index >= str.length)
-            return buffer;
-        for (var i = index; i < str.length; i++)
-            buffer.push(this.toggleLetters(str, index, i));
-        return this.permutationGenerator(str, index + 1, buffer);
-    },
-    
-    toggleLetters:function(str, index1, index2) {
-        'use strict';
-        if (index1 != index2) {
-            var temp = str[index1];
-            str[index1] = str[index2];
-            str[index2] = temp;
-        }
-        return str.join("");
-    }
+     compareTwoSignaturesPractical: function(shinglesFingA,shinglesFingB){
+         'use strict';
+         
+         var shinglesFing = new Array();
+         shinglesFing[0] = shinglesFingA;
+         shinglesFing[1]= shinglesFingB;
+         var hashFnLen = 100;
+         
+         var sets = this.minHashSignaturesGen(shinglesFing,hashFnLen);
+         
+         /* Determine the ratio of the hash function of SIGA equals to SIGB */ 
+         var SIMCount = 0;
+         for(var rows=0;rows<hashFnLen;rows++){
+             
+             if(sets[0][rows]==sets[1][rows]){
+                 SIMCount++;
+             }
+         }
+         
+         /* Determine the percentage of equal hash value over all the hash value*/
+         var percentage = SIMCount/hashFnLen*100;
+         
+         return percentage;
+     }
 };
 
