@@ -555,7 +555,7 @@ ccmf.Text.prototype = {
          var buckets = new Array(band);
          
          // r => num of rows per band
-         var r = minHashSignature[0].length/band;
+         var r = Math.floor(minHashSignature[0].length/band);
          
          for(var curBand=0;curBand<band;curBand++){
              
