@@ -482,7 +482,7 @@ ccmf.Text.prototype = {
          
          return SIG;
      },
-
+    
      /**
       * Random Hash Function Generator 
       * @param k,rowlength k is the number of random hash to generate, row length determines the upper limit if hash value
@@ -541,6 +541,138 @@ ccmf.Text.prototype = {
          var percentage = SIMCount/hashFnLen*100;
          
          return percentage;
-     }
+     },
+     
+     /**
+      * Specialised Locality-Sensitive Hashing 
+      * @param minHashSignature,band
+      * @method LSH
+      * @return candidatePairs array of candidate pairs
+      */
+     LSH : function(minHashSignature,band){
+         
+         var bucketsSize = 3571;
+         var buckets = new Array(band);
+         
+         // r => num of rows per band
+         var r = minHashSignature[0].length/band;
+         
+         for(var curBand=0;curBand<band;curBand++){
+             
+                /* New Buckets for each band */
+                buckets[curBand] = new Array(bucketsSize);
+                
+                for(var bucket=0;bucket<bucketsSize;bucket++){
+                    buckets[curBand][bucket]=new Array();
+                }
+              
+                for(var curSet=0;curSet<minHashSignature.length;curSet++){
+
+                    var vector = [];
+
+                    for(var row=(curBand*(r-1)+curBand);row<(curBand*(r-1)+curBand+r);row++){
+
+                        var element = minHashSignature[curSet][row];
+
+                        vector.push(element);
+                    }
+
+                    var hash = this.LSHHashingFn(vector,bucketsSize);
+
+                    buckets[curBand][hash].push(curSet);
+                }
+         }
+         
+         
+         var numOfCandidates = 0;
+         var candidatePairs = [];
+         
+         for(curBand=0;curBand<band;curBand++){
+            
+            for(var idx=0;idx<buckets[curBand].length;idx++){
+
+                if(typeof buckets[curBand][idx]!="undefined" && buckets[curBand][idx].length>1){
+                    
+                    /* There is one or more pairs in this bucket */
+                    
+                    /* Extract the pairs */
+                    
+                    var elems = buckets[curBand][idx];
+                    
+                    var combi = this.k_combinations(elems,2);
+                    
+                    while(combi.length>0){
+                        
+                        var insertedCP = combi.pop();
+                        
+                        if(!this.candidateExist(candidatePairs,elems))
+                             candidatePairs.push(insertedCP);        
+                    }
+                    
+                    numOfCandidates++;
+                }
+            }
+         }
+         
+         return candidatePairs;
+     },
+     
+     LSHHashingFn : function(vector,bucketsSize){
+         
+         var T1,T2;
+         var Sum=0;
+         
+         for(var pts=0;pts<vector.length;pts++){
+             
+             Sum += Math.pow(vector[pts],pts);
+             
+         }
+         
+         T1 = Sum%bucketsSize;
+         
+         return T1;
+     },
+     
+    k_combinations: function (set, k) {
+        var i, j, combs, head, tailcombs;
+        if (k > set.length || k <= 0) {
+        return [];
+        }
+        if (k == set.length) {
+        return [set];
+        }
+        if (k == 1) {
+        combs = [];
+        for (i = 0; i < set.length; i++) {
+        combs.push([set[i]]);
+        }
+        return combs;
+        }
+        // Assert {1 < k < set.length}
+        combs = [];
+        for (i = 0; i < set.length - k + 1; i++) {
+        head = set.slice(i, i+1);
+        tailcombs = this.k_combinations(set.slice(i + 1), k - 1);
+        for (j = 0; j < tailcombs.length; j++) {
+        combs.push(head.concat(tailcombs[j]));
+        }
+        }
+        return combs;
+    },
+    
+    candidateExist : function(candidateList,potentialCandidate){
+        
+        for(var can=0;can<candidateList.length;can++){
+           
+           arr = candidateList[can];
+           
+           if(arr[0]==potentialCandidate[0]&&arr[1]==potentialCandidate[1]){
+               return true;
+           }
+           
+        }
+        
+        return false;
+    }
 };
 
