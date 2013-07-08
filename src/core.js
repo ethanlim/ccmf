@@ -34,9 +34,11 @@ ccmf.namespace = function (ns_string) {
     var parts = ns_string.split('.'),
         parent = ccmf;
     
+    //Strip the redundent leading Global Variable
     if (parts[0] === "ccmf") {
         parts = parts.slice(1);
     }
+    
     for (var i = 0; i < parts.length; i += 1) {
         // create a property if it doesn't exist
         if (parent[parts[i]] === "undefined") {
@@ -45,4 +47,30 @@ ccmf.namespace = function (ns_string) {
         parent = parent[parts[i]];
     }
     return parent;
+};
+
+/**
+ * The Core class.
+ * @class Core
+ * @constructor
+ */
+ccmf.Core = ccmf.namespace('Core');
+
+/**
+ * Core Constructor
+ * @param none
+ * @method create
+ * @static
+ * @return {ccmf.Core} The newly created vector.
+ */
+ccmf.Core = function () {
+    'use strict';
+    var newObj = new ccmf.Core();
+    return newObj;
+};
+
+ccmf.Core.prototype = {
+    
+    init:function(){
+    }
 };

@@ -50,57 +50,86 @@ ccmf.Data.create = function () {
  * @constructor
  */
 ccmf.Data.prototype = {
-		
-		accessFromLocalhost:false,
 		rootRef:null,
-		endpoint: "https://ccmf.firebaseio.com",
-		
+                endpoint: "https://ccmf.firebaseio.com",
 		init:function(){
-			
-			var listRef = new Firebase(this.endpoint);
-			
-			this.rootRef = listRef;
-			
-			/* Obtain the current domain */
-			if(this.domain()=="localhost"){
-				this.accessFromLocalhost = true;
-			}else{
-				this.accessFromLocalhost = false;
-			}
+                    this.rootRef = new Firebase(this.endpoint);
 		},
 		
 		domain:function(){
-			return window.location.host;
+                    return window.location.host;
 		},
 		
 		pathURL:function(){
-			return Sha1.hash(window.location.pathname,true);
+                    // Returns the base64 hash
+                    return btoa(window.location.pathname);
 		},
 
-		text:function(mode,signature){
-			this.init();
-			
-			var textRef = this.rootRef.child('text');
-			var domainRef = textRef.child(this.domain());
-			var pathRef = domainRef.child(this.pathURL());
-			
-			var numOfSignature = signature.length;
-			
-			switch(mode){
-			case 'r':
-				break;
-			case 'w':
-				for(var sig=0;sig<numOfSignature;sig++){
-					
-					var sigRef = pathRef.child(sig);
-					
-					for(var elem=0;elem<signature[sig].length;elem++){
-					
-						sigRef.push({signature:signature[sig][elem]});
-					}
-				}
-				break;
-			}
+                signatureLength:function(callback){
+                    this.init();
+                    var textRef = this.rootRef.child('text');
+                    var sigLenRef = textRef.child('noOfSignatures');
+                    sigLenRef.once('value',callback);
+                },
+                
+		text:function(mode,signature,startPriority,endPriority,callback){
+                    this.init();
+                    
+                    var textRef = this.rootRef.child('text');
+                    var signaturesLabelRef = textRef.child('signatures');
+                    var numOfSignaturesOnRepoRef = textRef.child('noOfSignatures');
+                    
+                    switch(mode){
+                        case 'r':
+                            
+                            var signaturesQuery = signaturesLabelRef.startAt(startPriority).endAt(endPriority);
+                            signaturesQuery.on('value',callback);
+                        break;
+
+                        case 'w':
+
+                            numOfSignaturesOnRepoRef.once('value',function(snapshot){
+
+                                // Once the number of signatures in repository is determine, let's save!
+
+                                var numOfSignaturesOnRepo = parseInt(snapshot.val());
+                                var dataObj = ccmf.Data.create();
+
+                                    //Write
+                                    for(var sig=0;sig<signature.length;sig++){
+
+                                            /* Start Critical Region */
+                                            var newSignatureRef = signaturesLabelRef.push();
+                                            
+                                            console.log('New Signatures Priority :'+parseInt(numOfSignaturesOnRepo+sig));
+
+                                            /* End Critical Region */
+
+                                            /* Identify the domain and path of signature */
+                                            newSignatureRef.setWithPriority({
+                                                                    domain:dataObj.domain(),
+                                                                    path:dataObj.pathURL()
+                                                                },
+                                                                parseInt(numOfSignaturesOnRepo+sig))
+
+                                            for(var elem=0;elem<signature[sig].length;elem++){
+                                                
+                                                    newSignatureRef.child(elem).setWithPriority(signature[sig][elem],elem);
+                                            }
+                                    }
+
+                                    /* Add the number of added signatures to the counter @ Repo */
+                                    /* Start Critical Region */
+
+                                    textRef.child('noOfSignatures').transaction(function(current_val){
+                                            return current_val + signature.length;
+                                    });
+
+                                    /* End Critical Region */
+                            });
+                
+                        break;
+                    }
 		},
 		
 		image:function(mode,signature){
@@ -111,7 +140,7 @@ ccmf.Data.prototype = {
 				break;
 			case 'w':
 				break;
-		}
+                        }
 		}
 		
 };

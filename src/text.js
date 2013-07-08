@@ -453,6 +453,7 @@ ccmf.Text.prototype = {
             
          }
          
+         /* Write the signature matrix into data source */
          var dataObj = ccmf.Data.create();
          
          dataObj.text('w', SIG);
