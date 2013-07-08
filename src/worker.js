@@ -79,41 +79,84 @@ ccmf.Worker.prototype = (function(){
 
         start:function(){
 
-            var fetchedSignatures=[],
+            var signatures =[],
+            	randomSetIdx = [],
                 textOBj = ccmf.Text.create();
 
             for(var priorityIdx=0;priorityIdx<setsToRead;priorityIdx++){
-
+            	
+            	/* Select a random set */
                 var randomSetIdentifier = Math.floor(Math.random()*this.signatureLenAtRepo);
 
                 /* Search the Repo for a random set */
-
+                
                 this.dataObj.text('r',null,randomSetIdentifier,randomSetIdentifier,function(snapshot){
 
                     var rawData = snapshot.val();
                     console.log(rawData);
-                    fetchedSignatures.push(rawData);
                     
                     var newWorker = ccmf.Worker.create();
-                    newWorker.process(fetchedSignatures);
+                    
+                    signatures.push(rawData)
+                    randomSetIdx.push(randomSetIdentifier);
+                    
+                    if(signatures.length==5)
+                    	newWorker.process(signatures,randomSetIdentifier);
                 });
             }
         },
         
-        process:function(obtainedSignatures){
+        process:function(obtainedSignatures,globalSetIdentifier){
             
-            var formattedSig = null,
+            var formattedSignatures = [],
+            	sigDomainPaths = [],
+            	currentSig = [],
                 obtainedSig = null;
             
             for(var sigIdx=0;sigIdx<obtainedSignatures.length;sigIdx++){
                 
                 obtainedSig = obtainedSignatures[sigIdx];
+                sigDomainPaths[globalSetIdentifier[sigIdx]] = [];
                 
-                
-                
-                
+                for(timestamp in obtainedSig){
+                	
+                	for(elem in obtainedSig[timestamp]){
+                		
+                		if(elem=="domain"){
+                			sigDomainPaths[globalSetIdentifier[sigIdx]].push({'domain':obtainedSig[timestamp][elem]});
+                		}else if(elem=="path"){
+                			sigDomainPaths[globalSetIdentifier[sigIdx]].push({'path':obtainedSig[timestamp][elem]});
+                		}
+                		else{
+                			currentSig.push(obtainedSig[timestamp][elem]);
+                		}
+                	}
+                	
+                	formattedSignatures.push(currentSig);
+                	currentSig = [];
+                	n++;
+                }
+            }
+            
+            /* Use the text method to generate the lsh */
+            var textMod = ccmf.Text.create();
+            var candidatePairs = textMod.LSH(formattedSignatures,20);	//At this stage only m sets
+            
+            /* If candidate pairs exists */
+            if(candidatePairs>0){
+            	 this.result(candidatePairs,sigDomainPaths,globalSetIdentifier);
             }
         }
     
+        result:function(candidatePairs,signaturesDomainPaths,globalSetIdentifier){
+        	
+        	/* Note : candidatePairs and globalSetIdentifer has same n sets */
+        	
+        	for(set in globalSetIdentifier){
+        		
+        		
+        	}
+        	
+        }
     }
 }());
