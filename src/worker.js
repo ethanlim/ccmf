@@ -243,8 +243,9 @@ ccmf.Worker.prototype = (function(){
                                         orig_idx         : globalUniqueSetIdx,
                                         orig_domain      : signaturesDomainPaths[globalUniqueSetIdx]['domain'],
                                         orig_path        : signaturesDomainPaths[globalUniqueSetIdx]['path'],
-                                        tracked_domain   : this.dataObj.currentDomain(),
-                                        tracked_path     : this.dataObj.currentPathURL()
+                                        tracked_idx	     : globalIdentifiedSetIdx,
+                                        tracked_domain   : signaturesDomainPaths[globalIdentifiedSetIdx]['domain'],
+                                        tracked_path     : signaturesDomainPaths[globalIdentifiedSetIdx]['path']
                             };
 
                             identifiedSets[globalUniqueSetIdx].push(identifiedSet);
