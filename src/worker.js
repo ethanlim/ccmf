@@ -76,6 +76,17 @@ ccmf.Worker.prototype = (function(){
 
             });
         },
+        
+        randomNumExist:function(numArr,num){
+        	
+        	for(key in numArr){
+        		
+        		if(numArr[key] == num)
+        			return true;
+        	}
+        	
+        	return false;
+        },
 
         start:function(){
 
@@ -83,12 +94,21 @@ ccmf.Worker.prototype = (function(){
             	randomSetIdx = [],
                 rawData = null,
                 rawDataPriority = null,
+                randNumExist = false,
                 textOBj = ccmf.Text.create();
 
             for(var priorityIdx=0;priorityIdx<setsToRead;priorityIdx++){
             	
             	/* Select a random set */
-                var randomSetIdentifier = Math.floor(Math.random()*this.signatureLenAtRepo);
+            	do{
+            		var randomSetIdentifier = Math.floor(Math.random()*this.signatureLenAtRepo);
+                	
+            		if(randomSetIdx.length>0&&this.randomNumExist(randomSetIdx,randomSetIdentifier))
+            			randNumExist=true;
+            		else
+            			randNumExist=false;
+            		
+            	}while(randNumExist)
                 
                 randomSetIdx.push(randomSetIdentifier);
 
@@ -134,10 +154,8 @@ ccmf.Worker.prototype = (function(){
 
                             if(Object.keys(obtainedSig[timestamp])[elem]=="domain"){
                                     sigDomainPaths[globalSetIdentifier[sigIdx]].domain = obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]];
-	;
                             }else if(Object.keys(obtainedSig[timestamp])[elem]=="path"){
                                     sigDomainPaths[globalSetIdentifier[sigIdx]].path = obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]];
-
                             }
                             else if(Object.keys(obtainedSig[timestamp])[elem]==".priority"){
                                     priority = obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]];
@@ -154,16 +172,23 @@ ccmf.Worker.prototype = (function(){
                     
                             formattedSignatures[priority] = currentSig;
                             /* Current Sig must be pushed in the same order as priorities */
-                            //formattedSignatures.push(currentSig);
-                       
                        }
+                    else{
+                    	/* Since it belongs on the same page, remove it from the global identifier */
+                    		for(var set=0;set<globalSetIdentifier.length;set++){
+                    			
+                    			if(globalSetIdentifier[set]==priority)
+                    				globalSetIdentifier = globalSetIdentifier.splice(set,1);
+                    		}
+                    	
+                    }
                 }
             }
             
             /* Use the text method to generate the lsh */
             if(formattedSignatures.length>0){
                 
-                /*Sort the formatted array */
+                /*Sort the formatted array based on global set identifier*/
                 var processedSignatureArr = [];
                 
                 for(var i=0;i<globalSetIdentifier.length;i++){
@@ -217,7 +242,6 @@ ccmf.Worker.prototype = (function(){
                                         orig_idx         : globalUniqueSetIdx,
                                         orig_domain      : signaturesDomainPaths[globalUniqueSetIdx]['domain'],
                                         orig_path        : signaturesDomainPaths[globalUniqueSetIdx]['path'],
-                                        tracked_Idx      : globalIdentifiedSetIdx,
                                         tracked_domain   : this.dataObj.currentDomain(),
                                         tracked_path     : this.dataObj.currentPathURL()
                             };
