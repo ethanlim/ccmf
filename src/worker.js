@@ -81,27 +81,29 @@ ccmf.Worker.prototype = (function(){
 
             var signatures =[],
             	randomSetIdx = [],
+                rawData = null,
+                rawDataPriority = null,
                 textOBj = ccmf.Text.create();
 
             for(var priorityIdx=0;priorityIdx<setsToRead;priorityIdx++){
             	
             	/* Select a random set */
                 var randomSetIdentifier = Math.floor(Math.random()*this.signatureLenAtRepo);
+                
+                randomSetIdx.push(randomSetIdentifier);
 
                 /* Search the Repo for a random set */
                 
-                this.dataObj.text('r',null,randomSetIdentifier,randomSetIdentifier,function(snapshot){
+                this.dataObj.repoSignaturesOp('r',null,randomSetIdentifier,randomSetIdentifier,function(snapshot){
 
-                    var rawData = snapshot.val();
-                    console.log(rawData);
+                    rawData = snapshot.exportVal();
                     
-                    var newWorker = ccmf.Worker.create();
+                    signatures.push(rawData);
                     
-                    signatures.push(rawData)
-                    randomSetIdx.push(randomSetIdentifier);
-                    
-                    if(signatures.length==5)
-                    	newWorker.process(signatures,randomSetIdentifier);
+                    if(signatures.length==5){
+                        var newWorker = ccmf.Worker.create();
+                    	newWorker.process(signatures,randomSetIdx);
+                    }
                 });
             }
         },
@@ -109,9 +111,14 @@ ccmf.Worker.prototype = (function(){
         process:function(obtainedSignatures,globalSetIdentifier){
             
             var formattedSignatures = [],
+                priority=null,
             	sigDomainPaths = [],
             	currentSig = [],
+                textMod = ccmf.Text.create(),
+                candidatePairs = [],
                 obtainedSig = null;
+                
+            this.dataObj = ccmf.Data.create();
             
             for(var sigIdx=0;sigIdx<obtainedSignatures.length;sigIdx++){
                 
@@ -119,44 +126,111 @@ ccmf.Worker.prototype = (function(){
                 sigDomainPaths[globalSetIdentifier[sigIdx]] = [];
                 
                 for(timestamp in obtainedSig){
-                	
-                	for(elem in obtainedSig[timestamp]){
-                		
-                		if(elem=="domain"){
-                			sigDomainPaths[globalSetIdentifier[sigIdx]].push({'domain':obtainedSig[timestamp][elem]});
-                		}else if(elem=="path"){
-                			sigDomainPaths[globalSetIdentifier[sigIdx]].push({'path':obtainedSig[timestamp][elem]});
-                		}
-                		else{
-                			currentSig.push(obtainedSig[timestamp][elem]);
-                		}
-                	}
-                	
-                	formattedSignatures.push(currentSig);
-                	currentSig = [];
-                	n++;
+                    
+                    currentSig = [];
+                    
+                    /* Format the signature element in signatures into proper array for processing */
+                    for(elem=0;elem<Object.keys(obtainedSig[timestamp]).length;elem++){
+
+                            if(Object.keys(obtainedSig[timestamp])[elem]=="domain"){
+                                    sigDomainPaths[globalSetIdentifier[sigIdx]].domain = obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]];
+	;
+                            }else if(Object.keys(obtainedSig[timestamp])[elem]=="path"){
+                                    sigDomainPaths[globalSetIdentifier[sigIdx]].path = obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]];
+
+                            }
+                            else if(Object.keys(obtainedSig[timestamp])[elem]==".priority"){
+                                    priority = obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]];
+                            }
+                            else{
+                                    currentSig.push(obtainedSig[timestamp][Object.keys(obtainedSig[timestamp])[elem]]['.value']);
+                            }
+                    }
+                    
+                    /* If the signature has domain & path same as current domain and path, throw it away */
+                    if(sigDomainPaths[globalSetIdentifier[sigIdx]].domain!=this.dataObj.currentDomain()
+                       ||
+                       sigDomainPaths[globalSetIdentifier[sigIdx]].path!=this.dataObj.currentPathURL()){
+                    
+                            formattedSignatures[priority] = currentSig;
+                            /* Current Sig must be pushed in the same order as priorities */
+                            //formattedSignatures.push(currentSig);
+                       
+                       }
                 }
             }
             
             /* Use the text method to generate the lsh */
-            var textMod = ccmf.Text.create();
-            var candidatePairs = textMod.LSH(formattedSignatures,20);	//At this stage only m sets
+            if(formattedSignatures.length>0){
+                
+                /*Sort the formatted array */
+                var processedSignatureArr = [];
+                
+                for(var i=0;i<globalSetIdentifier.length;i++){
+                    
+                    processedSignatureArr.push(formattedSignatures[globalSetIdentifier[i]]);
+                }
+                
+                candidatePairs = textMod.LSH(processedSignatureArr,20);	//At this stage only m sets
+            }
             
             /* If candidate pairs exists */
-            if(candidatePairs>0){
+            if(candidatePairs.length>0){
             	 this.result(candidatePairs,sigDomainPaths,globalSetIdentifier);
             }
-        }
+        },
     
         result:function(candidatePairs,signaturesDomainPaths,globalSetIdentifier){
         	
-        	/* Note : candidatePairs and globalSetIdentifer has same n sets */
-        	
-        	for(set in globalSetIdentifier){
-        		
-        		
-        	}
-        	
+            this.dataObj = ccmf.Data.create();
+
+            var globalUniqueSetIdx = null,
+                globalIdentifiedSetIdx = null,
+                identifiedSets = [];
+
+            /* Note : candidatePairs and globalSetIdentifer has same n sets */
+
+            for(setIdx=0;setIdx<globalSetIdentifier.length;setIdx++){
+
+                    /* Obtained the global unique variable */
+                    globalUniqueSetIdx = globalSetIdentifier[setIdx];
+
+                    identifiedSets[globalUniqueSetIdx] = [];
+
+                    for(var pair=0;pair<candidatePairs.length;pair++){
+
+                        if(candidatePairs[pair][0]==setIdx){
+                            /* Either candidate matches the set index */    
+
+                            globalIdentifiedSetIdx = globalSetIdentifier[candidatePairs[pair][1]];
+
+                        }else if(candidatePairs[pair][1]==setIdx){
+
+
+                            globalIdentifiedSetIdx = globalSetIdentifier[candidatePairs[pair][0]];
+                        }
+
+
+                        if(candidatePairs[pair][0]==setIdx||candidatePairs[pair][1]==setIdx){
+
+                            var identifiedSet = {
+                                        orig_idx         : globalUniqueSetIdx,
+                                        orig_domain      : signaturesDomainPaths[globalUniqueSetIdx]['domain'],
+                                        orig_path        : signaturesDomainPaths[globalUniqueSetIdx]['path'],
+                                        tracked_Idx      : globalIdentifiedSetIdx,
+                                        tracked_domain   : this.dataObj.currentDomain(),
+                                        tracked_path     : this.dataObj.currentPathURL()
+                            };
+
+                            identifiedSets[globalUniqueSetIdx].push(identifiedSet);
+                        }
+
+                    }
+
+            }
+
+            /* Call Data Object Save Method */
+            this.dataObj.identifiedSignatures(identifiedSets);
         }
     }
 }());

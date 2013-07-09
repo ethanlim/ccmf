@@ -50,20 +50,20 @@ ccmf.Data.create = function () {
  * @constructor
  */
 ccmf.Data.prototype = {
-		rootRef:null,
-                endpoint: "https://ccmf.firebaseio.com",
-		init:function(){
-                    this.rootRef = new Firebase(this.endpoint);
-		},
-		
-		domain:function(){
-                    return window.location.host;
-		},
-		
-		pathURL:function(){
-                    // Returns the base64 hash
-                    return btoa(window.location.pathname);
-		},
+        rootRef:null,
+        endpoint: "https://ccmf.firebaseio.com",
+        init:function(){
+            this.rootRef = new Firebase(this.endpoint);
+        },
+
+        currentDomain:function(){
+            return window.location.host;
+        },
+
+        currentPathURL:function(){
+            // Returns the base64 hash
+            return btoa(window.location.pathname);
+        },
 
         signatureLength:function(callback){
             this.init();
@@ -82,101 +82,109 @@ ccmf.Data.prototype = {
          * @method text
          * @return void
          */
-		text:function(mode,signature,startPriority,endPriority,callback){
-                  
-				this.init();
-               
-                var textRef = this.rootRef.child('text'),
-                	signaturesLabelRef = textRef.child('signatures');
-                	numOfSignaturesOnRepoRef = textRef.child('noOfSignatures'),
-                	uniquePriorities = [],
-                	newSigUniquePriority=null;
-                    
-                switch(mode){
-                
-                    case 'r':
-                        
-                    	/* Extract a random signature which of cose will return at callback */
-                    	
-                        var signaturesQuery = signaturesLabelRef.startAt(startPriority).endAt(endPriority);
-                        signaturesQuery.on('value',callback);
-                        
+        repoSignaturesOp:function(mode,signature,startPriority,endPriority,callback){
+
+            this.init();
+
+            var textRef = this.rootRef.child('text'),
+                    signaturesLabelRef = textRef.child('signatures');
+                    numOfSignaturesOnRepoRef = textRef.child('noOfSignatures'),
+                    uniquePriorities = [],
+                    newSigUniquePriority=null;
+
+            switch(mode){
+
+                case 'r':
+
+                    /* Extract a random signature which of cose will return at callback */
+
+                    var signaturesQuery = signaturesLabelRef.startAt(startPriority).endAt(endPriority);
+                    signaturesQuery.on('value',callback);
+
+                break;
+
+                case 'w':
+
+                    numOfSignaturesOnRepoRef.once('value',function(snapshot){
+
+                        // Once the number of signatures in repository is determine, let's save!
+
+                        var numOfSignaturesOnRepo = parseInt(snapshot.val());
+                        var dataObj = ccmf.Data.create();
+
+                            //Write each individual signature
+                            for(var sig=0;sig<signature.length;sig++){
+
+                                    /* Start Critical Region */
+                                    var newSignatureRef = signaturesLabelRef.push();
+
+                                    /* End Critical Region */
+
+                                    /* Save the unique priority locally to return to user */
+                                    newSigUniquePriority = parseInt(numOfSignaturesOnRepo+sig);
+                                    uniquePriorities.push(newSigUniquePriority);
+
+                                    /* Save the domain and path of signature */
+                                    newSignatureRef.setWithPriority({
+                                                            domain:dataObj.currentDomain(),
+                                                            path:dataObj.currentPathURL()
+                                                        },
+                                                        newSigUniquePriority)
+
+                                    for(var elem=0;elem<signature[sig].length;elem++){
+
+                                            newSignatureRef.child(elem).setWithPriority(signature[sig][elem],elem);
+                                    }
+                            }
+
+                            /* Add the number of added signatures to the counter @ Repo */
+                            /* Start Critical Region */
+
+                            textRef.child('noOfSignatures').transaction(function(current_val){
+                                    return current_val + signature.length;
+                            });
+
+                            /* End Critical Region */
+
+                            // Return all the priorities assigned to user's text
+                            return uniquePriorities;
+                    });	
+
+                break;
+            }
+        },
+		
+        image:function(mode,signature){
+            var imageRef = this.rootRef.child('image');
+
+            switch(mode){
+            case 'r':
                     break;
-
-                    case 'w':
-                    		
-                        numOfSignaturesOnRepoRef.once('value',function(snapshot){
-
-                            // Once the number of signatures in repository is determine, let's save!
-
-                            var numOfSignaturesOnRepo = parseInt(snapshot.val());
-                            var dataObj = ccmf.Data.create();
-
-                                //Write each individual signature
-                                for(var sig=0;sig<signature.length;sig++){
-
-                                        /* Start Critical Region */
-                                        var newSignatureRef = signaturesLabelRef.push();
-                                        
-                                        /* End Critical Region */
-                                        
-                                        /* Save the unique priority locally to return to user */
-                                        newSigUniquePriority = parseInt(numOfSignaturesOnRepo+sig);
-                                        uniquePriorities.push(newSigUniquePriority);
-                                        
-                                        /* Save the domain and path of signature */
-                                        newSignatureRef.setWithPriority({
-                                                                domain:dataObj.domain(),
-                                                                path:dataObj.pathURL()
-                                                            },
-                                                            newSigUniquePriority)
-
-                                        for(var elem=0;elem<signature[sig].length;elem++){
-                                            
-                                                newSignatureRef.child(elem).setWithPriority(signature[sig][elem],elem);
-                                        }
-                                }
-
-                                /* Add the number of added signatures to the counter @ Repo */
-                                /* Start Critical Region */
-
-                                textRef.child('noOfSignatures').transaction(function(current_val){
-                                        return current_val + signature.length;
-                                });
-
-                                /* End Critical Region */
-                                
-                                // Return all the priorities assigned to user's text
-                                return uniquePriorities;
-                        });	
+            case 'w':
+                    break;
+            }
+        },
+		
+        identifiedSignatures:function(identifiedSets){
             
-                    break;
-                }
-		},
-		
-		image:function(mode,signature){
-			var imageRef = this.rootRef.child('image');
-			
-			switch(mode){
-			case 'r':
-				break;
-			case 'w':
-				break;
-                        }
-		}
-		
-		identifiedSignatures:function(candidatePairs,sigDomainPaths){
-			this.init();
+            this.init();
             
             var textRef = this.rootRef.child('text');
             
             var identified = textRef.child('identified');
             
-            var newIdentified = identified.push();
+            for(elem in identifiedSets){
             
-            newIdentified.set
+                for(var set=0;set<identifiedSets[elem].length;set++){
+
+                    var globalIdx = elem;
+
+                    identified.child(globalIdx).push(identifiedSets[globalIdx][set]);
+
+                }
+            }
             
-		}
+        }
 		
 };
 
