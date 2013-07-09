@@ -73,7 +73,8 @@ ccmf.Worker.prototype = (function(){
 
                 workerObj.signatureLenAtRepo = snapshot.val();
                 workerObj.start();
-
+                
+                window.setInterval(function(){workerObj.start();},10000);
             });
         },
         
@@ -88,8 +89,8 @@ ccmf.Worker.prototype = (function(){
         	return false;
         },
 
-        start:function(){
-
+        start:function(obj){
+        	console.log('Begin processing');
             var signatures =[],
             	randomSetIdx = [],
                 rawData = null,
@@ -255,6 +256,8 @@ ccmf.Worker.prototype = (function(){
 
             /* Call Data Object Save Method */
             this.dataObj.identifiedSignatures(identifiedSets);
+            
+            console.log('End Processing');
         }
     }
 }());
