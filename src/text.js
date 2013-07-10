@@ -56,6 +56,7 @@ ccmf.Text.prototype = {
      */
     stopWords : ['to','that','a','for','the','that','have','it','is'],
     alphabets : "abcdefghijklmnopqrstuvwxyz",
+    bands : 20,
     
     /**
      *  Function that determines if word is a stop word
@@ -522,25 +523,30 @@ ccmf.Text.prototype = {
       * @method LSH
       * @return candidatePairs array of candidate pairs
       */
-     LSH : function(minHashSignature,band){
+     LSH : function(minHashSignature){
          
-         var bucketsSize = 3571;
-         var buckets = new Array(band);
+         var bucketsSize = 104729;
+         var numOfBands = this.bands;
+         var buckets = new Array(numOfBands);
+         var hashSet = new Array(numOfBands);
          
          // r => num of rows per band
-         var r = Math.floor(minHashSignature[0].length/band);
+         var r = Math.floor(minHashSignature[0].length/numOfBands);
          
-         for(var curBand=0;curBand<band;curBand++){
+         for(var curBand=0;curBand<numOfBands;curBand++){
              
                 /* New Buckets for each band */
                 buckets[curBand] = new Array(bucketsSize);
+                hashSet[curBand] = [];
                 
                 for(var bucket=0;bucket<bucketsSize;bucket++){
                     buckets[curBand][bucket]=new Array();
                 }
               
+                /* For each minhash signature */
                 for(var curSet=0;curSet<minHashSignature.length;curSet++){
-
+                	
+                	/* Rows within a single band in one signature */
                     var vector = [];
 
                     for(var row=(curBand*(r-1)+curBand);row<(curBand*(r-1)+curBand+r);row++){
@@ -552,15 +558,26 @@ ccmf.Text.prototype = {
 
                     var hash = this.LSHHashingFn(vector,bucketsSize);
 
+                    /* Hash this into the current band buckets*/
                     buckets[curBand][hash].push(curSet);
+                    hashSet[curBand].push(hash);
                 }
          }
          
+         var results = {
+        		 buckets : buckets,
+        		 hashSet : hashSet,
+         }
          
-         var numOfCandidates = 0;
+         return results;
+     },
+     
+     candididatePairsExtraction:function(buckets){
+    	
+    	 var numOfCandidates = 0;
          var candidatePairs = [];
          
-         for(curBand=0;curBand<band;curBand++){
+         for(curBand=0;curBand<this.bands;curBand++){
             
             for(var idx=0;idx<buckets[curBand].length;idx++){
 
@@ -587,7 +604,7 @@ ccmf.Text.prototype = {
             }
          }
          
-         return candidatePairs;
+         return candidatePairs;	 
      },
      
      LSHHashingFn : function(vector,bucketsSize){
@@ -606,7 +623,7 @@ ccmf.Text.prototype = {
          return T1;
      },
      
-    k_combinations: function (set, k) {
+     k_combinations: function (set, k) {
         var i, j, combs, head, tailcombs;
         if (k > set.length || k <= 0) {
         return [];
@@ -633,7 +650,7 @@ ccmf.Text.prototype = {
         return combs;
     },
     
-    candidateExist : function(candidateList,potentialCandidate){
+     candidateExist : function(candidateList,potentialCandidate){
         
         for(var can=0;can<candidateList.length;can++){
            
