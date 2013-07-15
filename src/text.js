@@ -164,7 +164,8 @@ ccmf.Text.prototype = {
      * @return shinglesFingerprint set of 32 integers
      */
      shinglesFingerprintConv: function(shinglesSet){
-       
+        'use strict';
+        
        var shinglesFingerprint = new Array();
        
        /* Foreach shingles */
@@ -173,7 +174,7 @@ ccmf.Text.prototype = {
            /* Extract the 1st 8 characters of the 128 bit hash (32 bits) */
            var hexHashString = MD5.encode((shinglesSet[cur_shingle])).substr(0,8);
            
-           /* Convert it to a 32 bit integer */
+           /* Convert it to a 32 bit - 4 bytes integer */
            var hash = parseInt(hexHashString,16);
            
            shinglesFingerprint.push(hash);
@@ -189,89 +190,86 @@ ccmf.Text.prototype = {
      *  @return SIG minhash signature matrix
      */
      minHashSignaturesGen: function(shinglesFingSet,n){
-         'use strict';
-         
-         var infinity=1.7976931348623157E+10308;
-         var universalSet = [];
-         
-         var numOfHashFn = n;     
-         var SIG = new Array();
-         
-         for(var shinglesFingPrint=0;shinglesFingPrint<shinglesFingSet.length;shinglesFingPrint++){
-             
-             /* Add all shingles fingerprint to the universal set */
-             universalSet = universalSet.concat(shinglesFingSet[shinglesFingPrint]);
-             
-             /* Initialise all SIC(i,c) to infinity */
-             
-             SIG[shinglesFingPrint] = new Array();
-             
-             for(var h=0;h<numOfHashFn;h++){
-                SIG[shinglesFingPrint].push(infinity); 
-                //Rows is the h1,h2,h3,h4,h5....
-             }
-         }
-         
-         //Generate n hash function
-         var hashFnArr = this.hashFnGen(numOfHashFn,universalSet.length);
-         var hashVal = new Array();
-         var hashFn = null;
-         
-         /* Construct the signature matrix */
-         
-         for(var rows=0;rows<universalSet.length;rows++){
-          
-            /* Obtain one element from universal set */
-            var uniElem = universalSet[rows];
-            hashVal = [];
-            
-            /* Simulate the permutation       
-             * Compute h1(r),h2(r),h3(r),.... */
-            for(hashFn=0;hashFn<hashFnArr.length;hashFn++){
-                hashVal.push(hashFnArr[hashFn](uniElem));
+        'use strict';
+
+        var infinity=1.7976931348623157E+10308,
+            universal = 4294967296,
+            numOfHashFn = n,
+            SIG = new Array(),                                  //Signature Matrix
+            hashFnArr = this.hashFnGen(numOfHashFn,universal),  //Generate n random hash function
+            hashVal = new Array(),
+            c=null,
+            i=null,
+            shingles=null,
+            hashFn=null;
+           
+        /* Construct the signature matrix */
+        for(c=0;c<shinglesFingSet.length;c++){
+
+            /* Initialise all SIC(i,c) to infinity */
+            SIG[c] = new Array();
+
+            /* Foreach column , set all rows to infinity*/
+            for(i=0;i<numOfHashFn;i++){
+                SIG[c].push(infinity); 
             }
-            
-            for(var shinglesFing=0;shinglesFing<shinglesFingSet.length;shinglesFing++){
+
+            for(shingles=0;shingles<shinglesFingSet[c].length;shingles++){
                 
-                if(shinglesFingSet[shinglesFing].indexOf(uniElem)>-1){
-                    
-                    for(var i=0;i<SIG[shinglesFing].length;i++){
-                        if(hashVal[i] < SIG[shinglesFing][i]){
-                            SIG[shinglesFing][i]= hashVal[i];
-                        }
-                    }
-                    
+                /* Obtain one element (4 bytes int) from universal set [Implied c has 1 in row r]*/
+                var r = shinglesFingSet[c][shingles];
+
+                /* Simulate the permutation       
+                * Compute h1(r),h2(r),h3(r),.... */
+                hashVal = [];
+                for(hashFn=0;hashFn<hashFnArr.length;hashFn++){
+                    hashVal.push(hashFnArr[hashFn](r));
                 }
                 
-            }
-            
-         }
-         
-         return SIG;
+                /* Both n and SIG[c].length are equal */
+                for(i=0;i<SIG[c].length;i++){
+                    if(hashVal[i] < SIG[c][i]){
+                        SIG[c][i]= hashVal[i];
+                    }
+                }
+            }   
+        }
+        
+        return SIG;
      },
     
      /**
       * Random Hash Function Generator 
-      * @param k,rowlength k is the number of random hash to generate, row length determines the upper limit if hash value
+      * @param k - k is the number of random hash to generate
+      * @param rowLen - row length determines the upper limit
       * @method hashFnGen
       * @return fnArr an array of random hash functions
       */
      hashFnGen : function(k,rowLen){
          
-         var fnArr = new Array();
+         var fnArr = new Array(), aRan = [],bRan =[];
+         var min = 1;
+         var max = rowLen-1;
+            
+         /* This ensure that a and b are not reference of aRan and bRan */
+         function createFn(a,b){
+             return function(x){
+                    
+                    // Modulo by row length to fall within it 
+                    var value = (a*x+b)%rowLen;
+                  
+                    return value;
+             };
+         };   
          
          for(var i=0;i<k;i++){
+             
+             /* These are kept as reference inside the closure */
+             aRan = Math.floor(Math.random() * (max - min + 1)) + min;  
+             bRan = Math.floor(Math.random() * (max - min + 1)) + min;  
+             
              fnArr.push(
-                function(x){
-                    
-                    var a = Math.floor(Math.random() * rowLen) + 1;
-                    var b = Math.floor(Math.random() * rowLen) + 1;
-                    
-                    // Module by row length to fall within it 
-                    var value = (a*x+b)%rowLen;
-                    
-                    return value;
-                }
+                createFn(aRan,bRan)
              );
          }
          
@@ -291,21 +289,21 @@ ccmf.Text.prototype = {
          var shinglesFing = new Array();
          shinglesFing[0] = shinglesFingA;
          shinglesFing[1]= shinglesFingB;
-         var hashFnLen = 100;
+         var n = 100;
          
-         var sets = this.minHashSignaturesGen(shinglesFing,hashFnLen);
+         var SIG = this.minHashSignaturesGen(shinglesFing,n);
          
          /* Determine the ratio of the hash function of SIGA equals to SIGB */ 
-         var SIMCount = 0;
-         for(var rows=0;rows<hashFnLen;rows++){
+         var CollisionCount = 0;
+         for(var h=0;h<n;h++){
              
-             if(sets[0][rows]==sets[1][rows]){
-                 SIMCount++;
+             if(SIG[0][h]==SIG[1][h]){
+                 CollisionCount++;
              }
          }
          
          /* Determine the percentage of equal hash value over all the hash value*/
-         var percentage = SIMCount/hashFnLen*100;
+         var percentage = CollisionCount/n*100;
          
          return percentage;
      },
@@ -359,7 +357,7 @@ ccmf.Text.prototype = {
          
          var results = {
         		 buckets : buckets,
-        		 hashSet : hashSet,
+        		 hashSet : hashSet
          }
          
          return results;
