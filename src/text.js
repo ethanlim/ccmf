@@ -316,48 +316,56 @@ ccmf.Text.prototype = {
       */
      LSH : function(minHashSignature){
          
-         var bucketsSize = 104729;
-         var numOfBands = this.bands;
-         var buckets = new Array(numOfBands);
-         var hashSet = new Array(numOfBands);
+         var    bucketsSize = 179426549,
+                numOfBands  = this.bands,
+                buckets     = new Array(numOfBands),
+                hashSet     = new Array(numOfBands),
+                curBand     = null, 
+                curSet      = null,
+                vector      = null,
+                row         = null,
+                element     = null,
+                hash        = null,
+                bucket      = null;
          
          // r => num of rows per band
          var r = Math.floor(minHashSignature[0].length/numOfBands);
          
-         for(var curBand=0;curBand<numOfBands;curBand++){
+         for(curBand=0;curBand<numOfBands;curBand++){
              
                 /* New Buckets for each band */
                 buckets[curBand] = new Array(bucketsSize);
                 hashSet[curBand] = [];
                 
-                for(var bucket=0;bucket<bucketsSize;bucket++){
+                for(bucket=0;bucket<bucketsSize;bucket++){
                     buckets[curBand][bucket]=new Array();
                 }
               
-                /* For each minhash signature */
-                for(var curSet=0;curSet<minHashSignature.length;curSet++){
+                /* For each minhash signature set */
+                for(curSet=0;curSet<minHashSignature.length;curSet++){
                 	
-                	/* Rows within a single band in one signature */
-                    var vector = [];
+                    /* Rows within a single band in one signature */
+                    vector = [];
 
-                    for(var row=(curBand*(r-1)+curBand);row<(curBand*(r-1)+curBand+r);row++){
+                    for(row=(curBand*(r-1)+curBand);row<(curBand*(r-1)+curBand+r);row++){
 
-                        var element = minHashSignature[curSet][row];
+                        element = minHashSignature[curSet][row];
 
                         vector.push(element);
                     }
 
-                    var hash = this.LSHHashingFn(vector,bucketsSize);
+                    hash = this.LSHHashingFn(vector,bucketsSize);
 
                     /* Hash this into the current band buckets*/
                     buckets[curBand][hash].push(curSet);
+                    /* Also record this hash for the current band  for this set*/
                     hashSet[curBand].push(hash);
                 }
          }
          
          var results = {
-        		 buckets : buckets,
-        		 hashSet : hashSet
+            buckets : buckets,
+            hashSet : hashSet
          }
          
          return results;
