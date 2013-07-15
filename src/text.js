@@ -316,7 +316,7 @@ ccmf.Text.prototype = {
       */
      LSH : function(minHashSignature){
          
-         var    bucketsSize = 179426549,
+         var    bucketsSize = 1301081,
                 numOfBands  = this.bands,
                 buckets     = new Array(numOfBands),
                 hashSet     = new Array(numOfBands),
