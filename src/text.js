@@ -246,7 +246,7 @@ ccmf.Text.prototype = {
       * @return fnArr an array of random hash functions
       */
      hashFnGen : function(k,rowLen){
-         
+    	 'use strict';
          var fnArr = new Array(), aRan = [],bRan =[];
          var min = 1;
          var max = rowLen-1;
@@ -315,7 +315,7 @@ ccmf.Text.prototype = {
       * @return candidatePairs array of candidate pairs
       */
      LSH : function(minHashSignature){
-         
+    	 'use strict';
          var    bucketsSize = 1301081,
                 numOfBands  = this.bands,
                 buckets     = new Array(numOfBands),
@@ -372,7 +372,7 @@ ccmf.Text.prototype = {
      },
      
      candididatePairsExtraction:function(buckets){
-    	
+    	 'use strict';
     	 var numOfCandidates = 0;
          var candidatePairs = [];
          
@@ -407,14 +407,12 @@ ccmf.Text.prototype = {
      },
      
      LSHHashingFn : function(vector,bucketsSize){
-         
-         var T1,T2;
-         var Sum=0;
+    	 'use strict';
+         var T1,Sum=0;
          
          for(var pts=0;pts<vector.length;pts++){
              
              Sum += Math.pow(vector[pts],pts);
-             
          }
          
          T1 = Sum%bucketsSize;
@@ -423,6 +421,7 @@ ccmf.Text.prototype = {
      },
      
      k_combinations: function (set, k) {
+    	'use strict';
         var i, j, combs, head, tailcombs;
         if (k > set.length || k <= 0) {
         return [];
