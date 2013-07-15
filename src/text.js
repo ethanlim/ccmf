@@ -316,7 +316,7 @@ ccmf.Text.prototype = {
       */
      LSH : function(minHashSignature){
     	 'use strict';
-         var    bucketsSize = 1301081,
+         var    bucketsSize = 104729,
                 numOfBands  = this.bands,
                 buckets     = new Array(numOfBands),
                 hashSet     = new Array(numOfBands),
@@ -373,8 +373,9 @@ ccmf.Text.prototype = {
      
      candididatePairsExtraction:function(buckets){
     	 'use strict';
-    	 var numOfCandidates = 0;
-         var candidatePairs = [];
+    	 var 	numOfCandidates = 0,
+    	 		curBand,
+    	 		candidatePairs = [];
          
          for(curBand=0;curBand<this.bands;curBand++){
             
