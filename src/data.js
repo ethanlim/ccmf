@@ -65,13 +65,6 @@ ccmf.Data.prototype = {
             return btoa(window.location.pathname);
         },
 
-        signatureLength:function(callback){
-            this.init();
-            var textRef = this.rootRef.child('text');
-            var sigLenRef = textRef.child('noOfSignatures');
-            sigLenRef.once('value',callback);
-        },
-        
         storeLsh : function(minHashSignatures){
            	this.init();
         	var textMod = ccmf.Text.create(),
@@ -90,10 +83,36 @@ ccmf.Data.prototype = {
         			
         			curBandRef = bandRef.child(curBand);
         			
-        			curBandRef.child(result['hashSet'][curBand][set]).push(JSON.stringify(minHashSignatures[set]));
+        			curBandRef.child(results['hashSet'][curBand][set]).push(JSON.stringify(minHashSignatures[set]));
+        		}
+        	}
+        },
+        
+        conductLsh : function(minHashSignatures){
+        	this.init();
+        	var textMod = ccmf.Text.create(),
+    		results = null,
+    		bandRef = this.rootRef.child('bands'),
+    		curBandRef = null,
+    		curBand = null,
+    		set = null;
+        	
+        	function callback(snapshot){
+        		var value = snapshot.val();
+        		
+        	}
+        	
+        	results = textMod.LSH(minHashSignatures);
+        	
+        	for(curBand=0;curBand<textMod.bands;curBand++){
+        		
+        		for(set=0;set<minHashSignatures.length;set++){
+        			
+        			curBandRef = bandRef.child(curBand);
+        			
+        			curBandRef.child(results['hashSet'][curBand][set]).once('value',callback);
         		}
         	}
         }
-		
 };
 

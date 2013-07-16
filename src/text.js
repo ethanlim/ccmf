@@ -57,6 +57,7 @@ ccmf.Text.prototype = {
     stopWords : ['to','that','a','for','the','that','have','it','is'],
     alphabets : "abcdefghijklmnopqrstuvwxyz",
     bands : 20,
+    n : 100,
     
     /**
      *  Function that determines if word is a stop word
@@ -189,12 +190,12 @@ ccmf.Text.prototype = {
      *  @method minHashSignaturesGen
      *  @return SIG minhash signature matrix
      */
-     minHashSignaturesGen: function(shinglesFingSet,n){
+     minHashSignaturesGen: function(shinglesFingSet){
         'use strict';
 
         var infinity=1.7976931348623157E+10308,
             universal = 4294967296,
-            numOfHashFn = n,
+            numOfHashFn = this.n,
             SIG = new Array(),                                  //Signature Matrix
             hashFnArr = this.hashFnGen(numOfHashFn,universal),  //Generate n random hash function
             hashVal = new Array(),
