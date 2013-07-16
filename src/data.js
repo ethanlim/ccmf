@@ -88,20 +88,18 @@ ccmf.Data.prototype = {
         	}
         },
         
-        conductLsh : function(minHashSignatures){
+        conductLsh : function(minHashSignatures,callback){
         	this.init();
         	var textMod = ccmf.Text.create(),
     		results = null,
     		bandRef = this.rootRef.child('bands'),
     		curBandRef = null,
     		curBand = null,
-    		set = null;
+                bucketRef = null,
+    		set = null, 
+                signatureSetFound = [];
         	
-        	function callback(snapshot){
-        		var value = snapshot.val();
-        		
-        	}
-        	
+                /* Obtain the vector hashes */
         	results = textMod.LSH(minHashSignatures);
         	
         	for(curBand=0;curBand<textMod.bands;curBand++){
@@ -109,8 +107,10 @@ ccmf.Data.prototype = {
         		for(set=0;set<minHashSignatures.length;set++){
         			
         			curBandRef = bandRef.child(curBand);
+                                
+                                bucketRef = curBandRef.child(results['hashSet'][curBand][set]);
         			
-        			curBandRef.child(results['hashSet'][curBand][set]).once('value',callback);
+        			bucketRef.once('value',callback);
         		}
         	}
         }

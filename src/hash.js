@@ -386,3 +386,369 @@ MD5.encode = function (string) {
 
             return temp.toLowerCase();
 }
+
+/**
+ *  MinHash Hash Functions
+ */
+
+var MinHashFn = {};
+
+
+MinHashFn.Generate = function(){
+    
+    var FunctionArray = [];
+    var rowLen = 4294967296;
+    
+    FunctionArray[0] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (938243813*x+449548425)%rowLen;
+
+        return value;
+    };
+    FunctionArray[1] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3501656610*x+3972643584)%rowLen;
+
+        return value;
+    };
+    FunctionArray[2] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (989286798*x+1740616241)%rowLen;
+
+        return value;
+    };
+    FunctionArray[3] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (279445565*x+227321191)%rowLen;
+
+        return value;
+    };
+    FunctionArray[4] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2525138838*x+2375197675)%rowLen;
+
+        return value;
+    };
+    FunctionArray[5] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1391177992*x+2273598062)%rowLen;
+
+        return value;
+    };
+    FunctionArray[6] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1765233525*x+3122473841)%rowLen;
+
+        return value;
+    };
+    FunctionArray[7] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2543622534*x+3276150337)%rowLen;
+
+        return value;
+    };
+    FunctionArray[8] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3538112737*x+1214063340)%rowLen;
+
+        return value;
+    };
+    FunctionArray[9] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (693746806*x+645677509)%rowLen;
+
+        return value;
+    };
+    FunctionArray[10] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2688207442*x+922213198)%rowLen;
+
+        return value;
+    };
+    FunctionArray[11] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1083836246*x+3273423626)%rowLen;
+
+        return value;
+    };
+    FunctionArray[12] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (879484938*x+649482222)%rowLen;
+
+        return value;
+    };
+    FunctionArray[13] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (781585411*x+2187620941)%rowLen;
+
+        return value;
+    };
+    FunctionArray[14] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (4217187924*x+409282534)%rowLen;
+
+        return value;
+    };
+    FunctionArray[15] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3997304204*x+3483865819)%rowLen;
+
+        return value;
+    };
+    FunctionArray[16] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1890696230*x+3837954244)%rowLen;
+
+        return value;
+    };
+    FunctionArray[17] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2400333341*x+2117565765)%rowLen;
+
+        return value;
+    };
+    FunctionArray[18] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1894529290*x+1415821789)%rowLen;
+
+        return value;
+    };
+    FunctionArray[19] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3934480093*x+82924441)%rowLen;
+
+        return value;
+    };
+    FunctionArray[20] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (457936083*x+3502020083)%rowLen;
+
+        return value;
+    };
+    FunctionArray[21] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2057448810*x+825873002)%rowLen;
+
+        return value;
+    };
+    FunctionArray[22] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (70956257*x+3803368919)%rowLen;
+
+        return value;
+    };
+    FunctionArray[23] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (4111065769*x+577911722)%rowLen;
+
+        return value;
+    };
+    FunctionArray[24] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3647861596*x+375847830)%rowLen;
+
+        return value;
+    };
+    FunctionArray[25] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2199282009*x+3056603428)%rowLen;
+
+        return value;
+    };
+    FunctionArray[26] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3792129462*x+1729987571)%rowLen;
+
+        return value;
+    };
+    FunctionArray[27] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (222422346*x+2361499571)%rowLen;
+
+        return value;
+    };
+    FunctionArray[28] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (4133247564*x+158419197)%rowLen;
+
+        return value;
+    };
+    FunctionArray[29] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (350830640*x+1959352365)%rowLen;
+
+        return value;
+    };
+    FunctionArray[30] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2755092655*x+1161440783)%rowLen;
+
+        return value;
+    };
+    FunctionArray[31] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (82862384*x+1161440783)%rowLen;
+
+        return value;
+    };
+    FunctionArray[32] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (900580792*x+1543109527)%rowLen;
+
+        return value;
+    };
+    FunctionArray[33] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3070307155*x+332490895)%rowLen;
+
+        return value;
+    };
+    FunctionArray[34] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (971361265*x+1654498089)%rowLen;
+
+        return value;
+    };
+    FunctionArray[35] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (677289179*x+198263575)%rowLen;
+
+        return value;
+    };
+    FunctionArray[36] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (6660553*x+756084743)%rowLen;
+
+        return value;
+    };
+    FunctionArray[37] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (4270212011*x+3055539426)%rowLen;
+
+        return value;
+    };
+    FunctionArray[38] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (818266003*x+478317643)%rowLen;
+
+        return value;
+    };
+    FunctionArray[39] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2300183882*x+2724540749)%rowLen;
+
+        return value;
+    };
+    FunctionArray[40] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1239455167*x+4287525061)%rowLen;
+
+        return value;
+    };
+    FunctionArray[41] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1674327431*x+2959381535)%rowLen;
+
+        return value;
+    };
+    FunctionArray[42] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1557761080*x+904181300)%rowLen;
+
+        return value;
+    };
+    FunctionArray[43] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3091725339*x+1656461228)%rowLen;
+
+        return value;
+    };
+    FunctionArray[44] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (3382005781*x+548587195)%rowLen;
+
+        return value;
+    };
+    FunctionArray[45] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1699744644*x+2375814789)%rowLen;
+
+        return value;
+    };
+    FunctionArray[46] = function(x){
+                   
+        // Modulo by row length to fall within it 
+        var value = (461206415*x+3272630411)%rowLen;
+
+        return value;
+    };
+    FunctionArray[47] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (4253919265*x+1610002264)%rowLen;
+
+        return value;
+    };
+    FunctionArray[48] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (1722374739*x+18508135)%rowLen;
+
+        return value;
+    };
+    FunctionArray[49] = function(x){
+                    
+        // Modulo by row length to fall within it 
+        var value = (2781478195*x+912297640)%rowLen;
+
+        return value;
+    };
+    
+    return FunctionArray;
+}
