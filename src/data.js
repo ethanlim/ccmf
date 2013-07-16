@@ -65,126 +65,54 @@ ccmf.Data.prototype = {
             return btoa(window.location.pathname);
         },
 
-        signatureLength:function(callback){
-            this.init();
-            var textRef = this.rootRef.child('text');
-            var sigLenRef = textRef.child('noOfSignatures');
-            sigLenRef.once('value',callback);
+        storeLsh : function(minHashSignatures){
+           	this.init();
+        	var textMod = ccmf.Text.create(),
+        		results = null,
+        		bandRef = this.rootRef.child('bands'),
+        		curBandRef = null,
+        		curBand = null,
+        		set = null;
+        	
+        	/* Obtain the vector hashes */
+        	results = textMod.LSH(minHashSignatures);
+        	
+        	for(curBand=0;curBand<textMod.bands;curBand++){
+        		
+        		for(set=0;set<minHashSignatures.length;set++){
+        			
+        			curBandRef = bandRef.child(curBand);
+        			
+        			curBandRef.child(results['hashSet'][curBand][set]).push(JSON.stringify(minHashSignatures[set]));
+        		}
+        	}
         },
         
-        /**
-         * Text Data Object 
-         * @param mode (w => dataObj.text('w', SIG))
-         * @param signature minhash signature matrix
-         * @param startPriority
-         * @param endPriority
-         * @param callback
-         * @method text
-         * @return void
-         */
-        repoSignaturesOp:function(mode,signature,startPriority,endPriority,callback){
-
-            this.init();
-
-            var textRef = this.rootRef.child('text'),
-                    signaturesLabelRef = textRef.child('signatures');
-                    numOfSignaturesOnRepoRef = textRef.child('noOfSignatures'),
-                    uniquePriorities = [],
-                    newSigUniquePriority=null;
-
-            switch(mode){
-
-                case 'r':
-
-                    /* Extract a random signature which of cose will return at callback */
-
-                    var signaturesQuery = signaturesLabelRef.startAt(startPriority).endAt(endPriority);
-                    signaturesQuery.on('value',callback);
-
-                break;
-
-                case 'w':
-
-                    numOfSignaturesOnRepoRef.once('value',function(snapshot){
-
-                        // Once the number of signatures in repository is determine, let's save!
-
-                        var numOfSignaturesOnRepo = parseInt(snapshot.val());
-                        var dataObj = ccmf.Data.create();
-
-                            //Write each individual signature
-                            for(var sig=0;sig<signature.length;sig++){
-
-                                    /* Start Critical Region */
-                                    var newSignatureRef = signaturesLabelRef.push();
-
-                                    /* End Critical Region */
-
-                                    /* Save the unique priority locally to return to user */
-                                    newSigUniquePriority = parseInt(numOfSignaturesOnRepo+sig);
-                                    uniquePriorities.push(newSigUniquePriority);
-
-                                    /* Save the domain and path of signature */
-                                    newSignatureRef.setWithPriority({
-                                                            domain:dataObj.currentDomain(),
-                                                            path:dataObj.currentPathURL()
-                                                        },
-                                                        newSigUniquePriority)
-
-                                    for(var elem=0;elem<signature[sig].length;elem++){
-
-                                            newSignatureRef.child(elem).setWithPriority(signature[sig][elem],elem);
-                                    }
-                            }
-
-                            /* Add the number of added signatures to the counter @ Repo */
-                            /* Start Critical Region */
-
-                            textRef.child('noOfSignatures').transaction(function(current_val){
-                                    return current_val + signature.length;
-                            });
-
-                            /* End Critical Region */
-
-                            // Return all the priorities assigned to user's text
-                            return uniquePriorities;
-                    });	
-
-                break;
-            }
-        },
-		
-        image:function(mode,signature){
-            var imageRef = this.rootRef.child('image');
-
-            switch(mode){
-            case 'r':
-                    break;
-            case 'w':
-                    break;
-            }
-        },
-		
-        identifiedSignatures:function(identifiedSets){
-            
-            this.init();
-            
-            var textRef = this.rootRef.child('text');
-            
-            var identified = textRef.child('identified');
-            
-            for(elem in identifiedSets){
-            
-                for(var set=0;set<identifiedSets[elem].length;set++){
-
-                    var globalIdx = elem;
-
-                    identified.child(globalIdx).push(identifiedSets[globalIdx][set]);
-
-                }
-            }
-            
+        conductLsh : function(minHashSignatures,callback){
+        	this.init();
+        	var textMod = ccmf.Text.create(),
+    		results = null,
+    		bandRef = this.rootRef.child('bands'),
+    		curBandRef = null,
+    		curBand = null,
+            bucketRef = null,
+    		set = null, 
+            signatureSetFound = [];
+        	
+                /* Obtain the vector hashes */
+        	results = textMod.LSH(minHashSignatures);
+        	
+        	for(curBand=0;curBand<textMod.bands;curBand++){
+        		
+        		for(set=0;set<minHashSignatures.length;set++){
+        			
+        			curBandRef = bandRef.child(curBand);
+                                
+                    bucketRef = curBandRef.child(results['hashSet'][curBand][set]);
+        			
+        			bucketRef.once('value',callback);
+        		}
+        	}
         }
-		
 };
 

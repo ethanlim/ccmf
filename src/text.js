@@ -57,6 +57,7 @@ ccmf.Text.prototype = {
     stopWords : ['to','that','a','for','the','that','have','it','is'],
     alphabets : "abcdefghijklmnopqrstuvwxyz",
     bands : 20,
+    n : 100,
     
     /**
      *  Function that determines if word is a stop word
@@ -189,12 +190,12 @@ ccmf.Text.prototype = {
      *  @method minHashSignaturesGen
      *  @return SIG minhash signature matrix
      */
-     minHashSignaturesGen: function(shinglesFingSet,n){
+     minHashSignaturesGen: function(shinglesFingSet){
         'use strict';
 
         var infinity=1.7976931348623157E+10308,
             universal = 4294967296,
-            numOfHashFn = n,
+            numOfHashFn = this.n,
             SIG = new Array(),                                  //Signature Matrix
             hashFnArr = this.hashFnGen(numOfHashFn,universal),  //Generate n random hash function
             hashVal = new Array(),
@@ -216,11 +217,14 @@ ccmf.Text.prototype = {
 
             for(shingles=0;shingles<shinglesFingSet[c].length;shingles++){
                 
-                /* Obtain one element (4 bytes int) from universal set [Implied c has 1 in row r]*/
+                /* Obtain one element (4 bytes int) from universal set [Implied c has 1 in row r]
+                 * The implication is because all element are a subset of the universal set     
+                 */
                 var r = shinglesFingSet[c][shingles];
 
-                /* Simulate the permutation       
-                * Compute h1(r),h2(r),h3(r),.... */
+                /* Simulate the permutation of the rows     
+                * Compute h1(r),h2(r),h3(r),.... 
+                */
                 hashVal = [];
                 for(hashFn=0;hashFn<hashFnArr.length;hashFn++){
                     hashVal.push(hashFnArr[hashFn](r));
@@ -247,11 +251,16 @@ ccmf.Text.prototype = {
       */
      hashFnGen : function(k,rowLen){
     	 'use strict';
+         
+         return MinHashFn.Generate();
+         
+         /* True Random Function Generator */
+         /*
          var fnArr = new Array(), aRan = [],bRan =[];
          var min = 1;
          var max = rowLen-1;
             
-         /* This ensure that a and b are not reference of aRan and bRan */
+         // This ensure that a and b are not reference of aRan and bRan 
          function createFn(a,b){
              return function(x){
                     
@@ -264,7 +273,7 @@ ccmf.Text.prototype = {
          
          for(var i=0;i<k;i++){
              
-             /* These are kept as reference inside the closure */
+             // These are kept as reference inside the closure 
              aRan = Math.floor(Math.random() * (max - min + 1)) + min;  
              bRan = Math.floor(Math.random() * (max - min + 1)) + min;  
              
@@ -274,6 +283,8 @@ ccmf.Text.prototype = {
          }
          
          return fnArr;
+         
+         */
      },
      
      /**
