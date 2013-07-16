@@ -57,7 +57,7 @@ ccmf.Text.prototype = {
     stopWords : ['to','that','a','for','the','that','have','it','is'],
     alphabets : "abcdefghijklmnopqrstuvwxyz",
     bands : 20,
-    n : 50,
+    n : 100,
     
     /**
      *  Function that determines if word is a stop word

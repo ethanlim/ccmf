@@ -95,9 +95,9 @@ ccmf.Data.prototype = {
     		bandRef = this.rootRef.child('bands'),
     		curBandRef = null,
     		curBand = null,
-                bucketRef = null,
+            bucketRef = null,
     		set = null, 
-                signatureSetFound = [];
+            signatureSetFound = [];
         	
                 /* Obtain the vector hashes */
         	results = textMod.LSH(minHashSignatures);
@@ -108,7 +108,7 @@ ccmf.Data.prototype = {
         			
         			curBandRef = bandRef.child(curBand);
                                 
-                                bucketRef = curBandRef.child(results['hashSet'][curBand][set]);
+                    bucketRef = curBandRef.child(results['hashSet'][curBand][set]);
         			
         			bucketRef.once('value',callback);
         		}
