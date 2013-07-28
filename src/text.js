@@ -1,6 +1,6 @@
 /*
  *      Creative Common's Media Fingerprint Library
- *      Copyright (c) 2013, Lim Zhi Hao
+ *      Copyright (c) 2013, Lim Zhi Hao (Ethan)
  *      All rights reserved.
  *      Redistribution and use in source and binary forms, with or without modification, 
  *      are permitted provided that the following conditions are met:
@@ -25,7 +25,6 @@ ccmf.namespace('ccmf.Text');
 /**
  * The Text class.
  * @class Text
- * @constructor
  */
 ccmf.Text = function () {
     'use strict';
@@ -36,7 +35,8 @@ ccmf.Text = function () {
  * @param none
  * @method create
  * @static
- * @return {ccmf.Text} The newly created vector.
+ * @constructor
+ * @return {Object} The newly created vector.
  */
 ccmf.Text.create = function () {
     'use strict';
@@ -47,7 +47,6 @@ ccmf.Text.create = function () {
 /**
  * The Text class prototype
  * @class Text
- * @constructor
  */
 ccmf.Text.prototype = {
     
@@ -61,34 +60,45 @@ ccmf.Text.prototype = {
     
     /**
      *  Function that determines if word is a stop word
-     *  @param word input word to be checked
+     *  @param {String} word - input word to be checked
      *  @method isStopWord
-     *  @return {bool} true/false 
+     *  @return {Bool} true/false 
      */
     isStopWord: function(word){
         'use strict';
-        for(var i=0;i<this.stopWords.length;i++){
-            if(word.toLowerCase()==this.stopWords[i])
+        var i = 0,
+        max = 0;
+        
+        for(i=0,max=this.stopWords.length;i<max;i+=1){
+            if(word.toLowerCase()===this.stopWords[i]){
                 return true;
+            }
         }
         return false;
     },
     
     /**
      * Remove the stop words within a textual content
-     * @param rawText raw textual content
+     * @param {String} rawText - raw textual content
      * @method removeStopWords
-     * @return {string} 
+     * @return {String} fliteredTextString - raw text without stop words 
      */
     removeStopWords: function(rawText){
         'use strict';
-        var textArray = rawText.split(' ');
-        for(var i=0;i<textArray.length;i++){
+        var i = 0,
+        max = 0,
+        textArray = rawText.split(' '),
+        fliteredTextString = '';
+        
+        for(i=0,max<textArray.length;i<max;i+=1){
             if(this.isStopWord(textArray[i])){
                 textArray.splice(i,1);
             }
         }
-        return textArray.join(' ');
+        
+        fliteredTextString = textArray.join(' ');
+        
+        return fliteredTextString;
     },
     
     /**
@@ -96,20 +106,22 @@ ccmf.Text.prototype = {
      * Methodology: extract overlapping k-grams and stemmed
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
      * Recommended for news articles k = 9 
-     * @param rawText raw textual content without white spaces
-     * @param k     length of shingles (substring)
-     * @method fixedShingles
-     * @return the set of shingles
+     * @param {String} rawText - raw textual content without white spaces
+     * @param {Number} k - length of shingles (substring)
+     * @method fixedShinglesWithoutWS
+     * @return {Array} shinglesSet - the set of shingles
      */
     fixedShinglesWithoutWS: function(rawText,k){
         'use strict';
-        /* Remove Non-Alpha Characters */
-        rawText = rawText.replace(/\W/g, '');
-        var textWithoutWS = rawText.replace(/ /g,'');
-        var shinglesSet = new Array();
-        for(var i=0;i<textWithoutWS.length;i++){
-            if(i+k-1<textWithoutWS.length)
+        var textWithoutWS = rawText.replace(/\W/g, '').replace(/ /g,''),
+        	shinglesSet = new Array(),
+        	i,
+        	max;
+        
+        for(i=0,max=textWithoutWS.length;i<max;i+=1){
+            if(i+k-1<max){
                 shinglesSet.push(textWithoutWS.substr(i,k));   
+            }
         }
         return shinglesSet;
     },
@@ -117,10 +129,11 @@ ccmf.Text.prototype = {
     /**
      * Extract the shingles after removal of stop words
      * ie. k=3, {abc,bcd,cde,...} from abcdefgh
-     * @param rawText raw textual content
-     * @param k     length of shingles (substring)
+     * Just a wrapper for two functions : removeStopWords => fixedShinglesWithoutWS
+     * @param rawText - raw textual content
+     * @param k	- length of shingles
      * @method removedStopWordShingles
-     * @return the set of shingles
+     * @return {Array} shinglesSet - the set of shingles
      */
     removedStopWordShingles: function(rawText,k){
         'use strict';
@@ -131,109 +144,121 @@ ccmf.Text.prototype = {
     
     /**
      * Extract Shingles via two words after stop word 
-     * @param rawText raw textual content
+     * @param {String} rawText - raw textual content
      * @method stopMoreShingles
-     * @return the set of shingles
+     * @return {Array} shinglesSet - the set of shingles
      */
     stopMoreShingles: function(rawText){
         'use strict';
         /* Remove Non-Alpha Characters */
-        rawText = rawText.replace(/\W/g, '');
-        var textArray = rawText.split(' ');
-        var shinglesSet=new Array();
-        for(var i=0;i<textArray.length;i++){
+        var textArray = rawText.replace(/\W/g, '').split(' '),
+        	shinglesSet=[],
+        	i=0,
+        	max=0;
+        
+        for(i=0,max=textArray.length;i<max;i++){
             
             if(this.isStopWord(textArray[i])){
             
                 /* Take the next two words and skip them */
-                if(i==textArray.length-1)
+                if(i==max-1){
                     shinglesSet.push(textArray[i]);
-                else if(i+1==textArray.length-1)
+                }else if(i+1==max-1){
                     shinglesSet.push(textArray[i]+' '+textArray[i+1]);
-                else                              
+                }else{                              
                     shinglesSet.push(textArray[i]+' '+textArray[i+1]+' '+textArray[i+2]);
-               
+                }
             }
+            
         }
         return shinglesSet;
     },
     
     /**
      * Hash Shingles to 32 bit integers
-     * @param shinglesSet set of shingles
+     * @param {Array} shinglesSet - set of shingles
      * @method shinglesFingerprintConv
-     * @return shinglesFingerprint set of 32 integers
+     * @return {Array} shinglesFingerprint - set of 32 integers
      */
      shinglesFingerprintConv: function(shinglesSet){
-        'use strict';
+    	 'use strict';
         
-       var shinglesFingerprint = new Array();
+    	 var shinglesFingerprint = [],
+    	 cur_shingle=0,
+    	 hexHashString='',
+    	 shinglesSetLen = 0,
+    	 hash = 0;
        
-       /* Foreach shingles */
-       for(var cur_shingle=0;cur_shingle<shinglesSet.length;cur_shingle++){
+    	 /* Foreach shingles */
+    	 for(cur_shingle=0,shinglesSetLen=shinglesSet.length;cur_shingle<shinglesSetLen;cur_shingle+=1){
            
-           /* Extract the 1st 8 characters of the 128 bit hash (32 bits) */
-           var hexHashString = MD5.encode((shinglesSet[cur_shingle])).substr(0,8);
+    		 /* Extract the 1st 8 characters of the 128 bit hash (32 bits) */
+    		 hexHashString = MD5.encode((shinglesSet[cur_shingle])).substr(0,8);
            
-           /* Convert it to a 32 bit - 4 bytes integer */
-           var hash = parseInt(hexHashString,16);
+    		 /* Convert it to a 32 bit - 4 bytes integer */
+    		 hash = parseInt(hexHashString,16);
            
-           shinglesFingerprint.push(hash);
-       }
-       
-       return shinglesFingerprint;
+    		 shinglesFingerprint.push(hash);
+    	 }
+	       
+    	 return shinglesFingerprint;
      },
      
      /**
-     *  Generate the minHash Signatures for any size of shingles fingerprint set
-     *  @param shinglesFingSet, n  shinglesFingSet : a variable set of shingles n : number of rand hash functions
-     *  @method minHashSignaturesGen
-     *  @return SIG minhash signature matrix
-     */
+      *  Generate the minHash Signatures for any size of shingles fingerprint set
+      *  @param {Array} shinglesFingSet - a variable set of shingles
+      *  @method minHashSignaturesGen
+      *  @return {Array} - SIG minhash signature matrix
+      */
      minHashSignaturesGen: function(shinglesFingSet){
         'use strict';
 
         var infinity=1.7976931348623157E+10308,
             universal = 4294967296,
             numOfHashFn = this.n,
-            SIG = new Array(),                                  //Signature Matrix
+            SIG = [],                                  			//Signature Matrix
             hashFnArr = this.hashFnGen(numOfHashFn,universal),  //Generate n random hash function
-            hashVal = new Array(),
-            c=null,
-            i=null,
-            shingles=null,
-            hashFn=null;
+            hashVal = [],
+            c=0,
+            i=0,
+            r='',
+            shingles = 0,
+            hashFn = null,
+            maxNumOfHashFn = 0,
+            shinglesFingSetMax = 0,
+            maxNumOfShingles = 0,
+            LSHRowLen = 0;
            
         /* Construct the signature matrix */
-        for(c=0;c<shinglesFingSet.length;c++){
+        for(c=0,shinglesFingSetMax=shinglesFingSet.length;c<shinglesFingSetMax;c+=1){
 
             /* Initialise all SIC(i,c) to infinity */
-            SIG[c] = new Array();
+            SIG[c] = [];
 
             /* Foreach column , set all rows to infinity*/
-            for(i=0;i<numOfHashFn;i++){
+            for(i=0;i<numOfHashFn;i+=1){
                 SIG[c].push(infinity); 
             }
 
-            for(shingles=0;shingles<shinglesFingSet[c].length;shingles++){
+            for(shingles=0,maxNumOfShingles=shinglesFingSet[c].length;shingles<maxNumOfShingles;shingles+=1){
                 
                 /* Obtain one element (4 bytes int) from universal set [Implied c has 1 in row r]
                  * The implication is because all element are a subset of the universal set     
                  */
-                var r = shinglesFingSet[c][shingles];
+                r = shinglesFingSet[c][shingles];
 
                 /* Simulate the permutation of the rows     
                 * Compute h1(r),h2(r),h3(r),.... 
                 */
                 hashVal = [];
-                for(hashFn=0;hashFn<hashFnArr.length;hashFn++){
+                for(hashFn=0,maxNumOfHashFn=hashFnArr.length;hashFn<maxNumOfHashFn;hashFn+=1){
                     hashVal.push(hashFnArr[hashFn](r));
                 }
                 
                 /* Both n and SIG[c].length are equal */
-                for(i=0;i<SIG[c].length;i++){
+                for(i=0,LSHRowLen=SIG[c].length;i<LSHRowLen;i+=1){
                     if(hashVal[i] < SIG[c][i]){
-                        SIG[c][i]= hashVal[i];
+                        SIG[c][i] = hashVal[i];
                     }
                 }
             }   
@@ -244,15 +269,17 @@ ccmf.Text.prototype = {
     
      /**
       * Random Hash Function Generator 
-      * @param k - k is the number of random hash to generate
-      * @param rowLen - row length determines the upper limit
+      * @param {Number} k - k is the number of random hash to generate
+      * @param {Number} rowLen - row length determines the upper limit
       * @method hashFnGen
-      * @return fnArr an array of random hash functions
+      * @return {Array} functionArray - an array of random hash functions
       */
-     hashFnGen : function(k,rowLen){
+     hashFnGen: function(k,rowLen){
     	 'use strict';
-         
-         return MinHashFn.Generate();
+    	 
+         var functionArray =  MinHashFn.Generate();
+    	 
+         return functionArray;
          
          /* True Random Function Generator */
          /*
@@ -297,24 +324,28 @@ ccmf.Text.prototype = {
      compareTwoSignaturesPractical: function(shinglesFingA,shinglesFingB){
          'use strict';
          
-         var shinglesFing = new Array();
+         var shinglesFing = [],
+         h = 0,
+         n = this.n,
+         CollisionCount = 0,
+         percentage = 0,
+         SIG = null;
+         
          shinglesFing[0] = shinglesFingA;
          shinglesFing[1]= shinglesFingB;
-         var n = 100;
          
-         var SIG = this.minHashSignaturesGen(shinglesFing,n);
+         SIG = this.minHashSignaturesGen(shinglesFing,n);
          
          /* Determine the ratio of the hash function of SIGA equals to SIGB */ 
-         var CollisionCount = 0;
-         for(var h=0;h<n;h++){
-             
-             if(SIG[0][h]==SIG[1][h]){
+         
+         for(h=0;h<n;h++){
+             if(SIG[0][h]===SIG[1][h]){
                  CollisionCount++;
              }
          }
          
          /* Determine the percentage of equal hash value over all the hash value*/
-         var percentage = CollisionCount/n*100;
+         percentage = CollisionCount/n*100;
          
          return percentage;
      },
@@ -337,10 +368,12 @@ ccmf.Text.prototype = {
                 row         = null,
                 element     = null,
                 hash        = null,
-                bucket      = null;
+                r = 0,
+                bucket      = null,
+                results		= null;
          
          // r => num of rows per band
-         var r = Math.floor(minHashSignature[0].length/numOfBands);
+         r = Math.floor(minHashSignature[0].length/numOfBands);
          
          for(curBand=0;curBand<numOfBands;curBand++){
              
@@ -349,12 +382,11 @@ ccmf.Text.prototype = {
                 hashSet[curBand] = [];
                 
                 for(bucket=0;bucket<bucketsSize;bucket++){
-                    buckets[curBand][bucket]=new Array();
+                    buckets[curBand][bucket]=[];
                 }
               
                 /* For each minhash signature set */
                 for(curSet=0;curSet<minHashSignature.length;curSet++){
-                	
                     /* Rows within a single band in one signature */
                     vector = [];
 
@@ -374,37 +406,46 @@ ccmf.Text.prototype = {
                 }
          }
          
-         var results = {
+         results = {
             buckets : buckets,
             hashSet : hashSet
-         }
+         };
          
          return results;
      },
      
+     /**
+      * Extract the candidate pairs from all buckets
+      * @param {Array} buckets
+      * @returns {Array} candidate pairs
+      */
      candididatePairsExtraction:function(buckets){
     	 'use strict';
-    	 var 	numOfCandidates = 0,
-    	 		curBand,
-    	 		candidatePairs = [];
+    	 var numOfCandidates = 0,
+    	 curBand = 0,
+    	 idx = 0,
+    	 elems = 0,
+    	 combi = null,
+    	 insertedCP = null,
+    	 candidatePairs = [];
          
          for(curBand=0;curBand<this.bands;curBand++){
             
-            for(var idx=0;idx<buckets[curBand].length;idx++){
+            for(idx=0;idx<buckets[curBand].length;idx++){
 
-                if(typeof buckets[curBand][idx]!="undefined" && buckets[curBand][idx].length>1){
+                if(typeof buckets[curBand][idx]!=="undefined" && buckets[curBand][idx].length>1){
                     
                     /* There is one or more pairs in this bucket */
                     
                     /* Extract the pairs */
                     
-                    var elems = buckets[curBand][idx];
+                	elems = buckets[curBand][idx];
                     
-                    var combi = this.k_combinations(elems,2);
+                    combi = this.k_combinations(elems,2);
                     
                     while(combi.length>0){
                         
-                        var insertedCP = combi.pop();
+                        insertedCP = combi.pop();
                         
                         if(!this.candidateExist(candidatePairs,elems))
                              candidatePairs.push(insertedCP);        
@@ -418,55 +459,82 @@ ccmf.Text.prototype = {
          return candidatePairs;	 
      },
      
+     /**
+      * Hash each vector of each bands into an unsigned integer
+      * @param {Array} vector
+      * @param {Number} bucketsSize
+      * @returns {Number} hash
+      */
      LSHHashingFn : function(vector,bucketsSize){
     	 'use strict';
-         var T1,Sum=0;
+         var hash = 0,
+         pts = 0,
+         sum = 0;
          
-         for(var pts=0;pts<vector.length;pts++){
+         for(pts=0;pts<vector.length;pts++){
              
-             Sum += Math.pow(vector[pts],pts);
+             sum += Math.pow(vector[pts],pts);
          }
          
-         T1 = Sum%bucketsSize;
+         hash = sum%bucketsSize;
          
-         return T1;
+         return hash;
      },
      
+     /**
+      * Find the combinations within characters
+      * @param {Array} set	- The set of characters
+      * @param {Number} k
+      * @returns {Array} combs - All combinations
+      */
      k_combinations: function (set, k) {
     	'use strict';
-        var i, j, combs, head, tailcombs;
+        var i = 0, 
+        j = 0, 
+        combs = '', 
+        head = '', 
+        tailcombs = '';
+        
         if (k > set.length || k <= 0) {
-        return [];
+        	return [];
         }
         if (k == set.length) {
-        return [set];
+        	return [set];
         }
         if (k == 1) {
-        combs = [];
-        for (i = 0; i < set.length; i++) {
-        combs.push([set[i]]);
+        	combs = [];
+	        for (i = 0; i < set.length; i++) {
+	        	combs.push([set[i]]);
+	        }
+	        return combs;
         }
-        return combs;
-        }
-        // Assert {1 < k < set.length}
+        
         combs = [];
         for (i = 0; i < set.length - k + 1; i++) {
-        head = set.slice(i, i+1);
-        tailcombs = this.k_combinations(set.slice(i + 1), k - 1);
-        for (j = 0; j < tailcombs.length; j++) {
-        combs.push(head.concat(tailcombs[j]));
-        }
+        	head = set.slice(i, i+1);
+        	tailcombs = this.k_combinations(set.slice(i + 1), k - 1);
+        	for (j = 0; j < tailcombs.length; j++) {
+        		combs.push(head.concat(tailcombs[j]));
+        	}
         }
         return combs;
     },
     
+    /**
+     * If candidate pairs exist in a given set of candidates
+     * @param {Array} candidateList
+     * @param {Array} potentialCandidate
+     * @returns {Boolean} 
+     */
      candidateExist : function(candidateList,potentialCandidate){
-        
-        for(var can=0;can<candidateList.length;can++){
+     
+    	 var can = 0;
+    	 
+    	 for(can=0;can<candidateList.length;can++){
            
            arr = candidateList[can];
            
-           if(arr[0]==potentialCandidate[0]&&arr[1]==potentialCandidate[1]){
+           if(arr[0]===potentialCandidate[0]&&arr[1]===potentialCandidate[1]){
                return true;
            }
            
