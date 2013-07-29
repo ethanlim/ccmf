@@ -25,7 +25,7 @@
  */
 var ccmf = ccmf || {};
 
-/*
+/**
  *  Namespace Creator
  *  @param ns_string namespace string
  */
