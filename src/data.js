@@ -19,7 +19,6 @@
  *      (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
  *      EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
-
 ccmf.namespace('ccmf.Data');
 
 /**
@@ -53,7 +52,13 @@ ccmf.Data.prototype = {
         rootRef:null,
         endpoint: "https://ccmf.firebaseio.com",
         init:function(){
-            this.rootRef = new Firebase(this.endpoint);
+        	if(typeof(Firebase)!="undefined"){
+        		this.rootRef = new Firebase(this.endpoint);
+        	}else{
+        		/* Purposefully inject into global namespace for Node.js */
+        		Firebase = require('firebase');
+        		this.rootRef = new Firebase(this.endpoint);
+        	}
         },
 
         currentDomain:function(){
@@ -83,7 +88,15 @@ ccmf.Data.prototype = {
         			
         			curBandRef = bandRef.child(curBand);
         			
-        			curBandRef.child(results['hashSet'][curBand][set]).push(JSON.stringify(minHashSignatures[set]));
+        			console.log('Firebase begins storing band: ' + curBand);
+        			
+        			curBandRef.child(results['hashSet'][curBand][set]).push(JSON.stringify(minHashSignatures[set]),function(error) {
+        					if (error) {
+        					    console.log('Data could not be saved.' + error);
+        					  } else {
+        					    console.log('Data saved successfully.');
+        					  }
+        			});
         		}
         	}
         },
