@@ -88,8 +88,6 @@ ccmf.Data.prototype = {
         			
         			curBandRef = bandRef.child(curBand);
         			
-        			console.log('Firebase begins storing band: ' + curBand);
-        			
         			curBandRef.child(results['hashSet'][curBand][set]).push(JSON.stringify(minHashSignatures[set]),function(error) {
         					if (error) {
         					    console.log('Data could not be saved.' + error);
