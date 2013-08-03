@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "author": {
     "name": "Lim Zhi Hao",
-    "email": "mail@ethanlim.net",
+    "email": "mail@ethanlim.net"
   },
-  "main": "./index.js",
+  "main" : "./index.js",
   "dependencies": {
     "firebase": "*"
   },
