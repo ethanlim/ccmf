@@ -11,7 +11,7 @@ var test = require('tap').test,
 /**
  * 	Testing Parameters
  */
-var n = 2,
+var n = 1000,
 	testFileName = '/tests/data.js',
 	testName = '';
 
