@@ -68,7 +68,7 @@ var testAsync = function(error){
  */
 test(testName,function(t){
 	
-	fs.readFile('./samples/reuters/reut2-000.sgm',function read(err,data){
+	fs.readFile('../samples/reuters/reut2-000.sgm',function read(err,data){
 		if(err){
 			console.log('Error Reading File : '+err);
 		}
