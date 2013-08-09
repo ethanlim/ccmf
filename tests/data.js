@@ -14,7 +14,8 @@ var test = require('tap').test,
 var n = 10,
 	testFileName = '/tests/data.js',
 	sampleFile = '../samples/reuters/reut2-000.sgm',
-	outputFileName = '../logs/tests/minhash.txt';
+	outputFileName = '../logs/tests/data.txt';
+
 /**
  *  Logger
  */
@@ -23,7 +24,7 @@ winston.profile('test');
 var logger = new (winston.Logger)({
     transports: [
       new (winston.transports.Console)(),
-      new (winston.transports.File)({filename: '../logs/tests/data.txt' })
+      new (winston.transports.File)({filename: outputFileName })
     ]
 });
 

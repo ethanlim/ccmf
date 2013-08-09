@@ -7,9 +7,9 @@ var test = require('tap').test,
  * 	Testing Parameters
  */
 var n = 10,
-	testFileName = '/tests/minhash.js',
+	testFileName = '/tests/lsh.js',
 	sampleFile = '../samples/reuters/reut2-000.sgm',
-	outputFileName = '../logs/tests/minhash.txt';
+	outputFileName = '../logs/tests/lsh.txt';
 
 /**
  *  Logger
