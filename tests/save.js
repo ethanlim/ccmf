@@ -13,8 +13,8 @@ var test = require('tap').test,
  */
 var n = 10,
 	testFileName = '/tests/data.js',
-	testName = 'Network Latency for Saving '+n+' Text Content,';
-
+	sampleFile = '../samples/reuters/reut2-000.sgm',
+	outputFileName = '../logs/tests/minhash.txt';
 /**
  *  Logger
  */
@@ -63,11 +63,13 @@ var testAsync = function(error){
 };
 
 /**
- *  Test Cases 
+ *  Generate Test Cases  
  */
-test(testName,function(t){
+test('Network Latency for Saving '+n+' Text Content',function(t){
 	
-	fs.readFile('../samples/reuters/reut2-000.sgm',function read(err,data){
+	fs.unlink(outputFileName);	
+	
+	fs.readFile(sampleFile,function read(err,data){
 		if(err){
 			console.log('Error Reading File : '+err);
 		}
@@ -98,13 +100,7 @@ test(testName,function(t){
 					
 					var registerShinglesFing = textMod.shinglesFingerprintConv(registeringTextShingles);
 					
-					/* Extract the Signature */
-					var signature = [];
-					signature[0] = registerShinglesFing; 
-					
-					var minHashSignature = textMod.minHashSignaturesGen(signature);
-					
-					logger.log('info','Begin Storing Signature for Article : '+ bodyIdx);
+					var minHashSignature = textMod.minHashSignaturesGen(registerShinglesFing);
 					
 					/* Register the Signature into the Registry*/
 					startTime = new Date().getTime();
@@ -114,8 +110,10 @@ test(testName,function(t){
 			}else{
 				console.log("No String Found");
 			}
-			
-			t.end();
 		}
 	});
+	
+	fs.close(outputFileName);
+	
+	t.end();
 });
