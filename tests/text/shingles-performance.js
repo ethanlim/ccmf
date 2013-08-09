@@ -7,9 +7,9 @@ var test = require('tap').test,
  * 	Testing Parameters
  */
 var n = 1000,
-	testFileName = '/tests/shingles.js',
-	sampleFile = '../samples/reuters/reut2-000.sgm',
-	outputFileName = '../logs/tests/shingles.txt';
+	testFileName = '/tests/shingles-performance.js',
+	sampleFile = '../../samples/reuters/reut2-000.sgm',
+	outputFileName = '../../logs/tests/shingles-performance.txt';
 
 /**
  *  Logger
@@ -50,24 +50,22 @@ test('Time taken for extracting shingles',function(t){
 			textContent = content.toString(),
 			registeringText = '',
 			bodyIdx = 0,
-			max = 0;
+			max = 0,
+			numOfArticles = 0;
 		
 			bodyTextArr  = textContent.match(/<\s*BODY[^>]*>([^<]*)<\s*\/\s*BODY\s*>/g);
 			
 			if(bodyTextArr!==null){
 				
-				max=bodyTextArr.length;
-				if(n<max){
-					max = n;
-				}
-								
-				for(bodyIdx=0;bodyIdx<max;bodyIdx++){
+				numOfArticles=bodyTextArr.length;
+						
+				for(bodyIdx=0;bodyIdx<n;bodyIdx++){
 					
 					registeringText = bodyTextArr[bodyIdx].replace(/(<([^>]+)>)/ig,"");
 					
 					var textMod = ccmf.ccmf.Text.create();
 					
-					var articleNo = Math.floor((Math.random()*(max-1))+0);
+					var articleNo = Math.floor((Math.random()*(numOfArticles-1))+0);
 					
 					var articleWordCount = registeringText.split('').length;
 					
@@ -91,17 +89,11 @@ test('Time taken for extracting shingles',function(t){
 					);
 					
 				}
-				console.log("Number of Articles : "+max);
+				console.log("Number of Articles : "+n);
 			}else{
 				console.log("No String Found");
 			}
 			t.end();
 		}
-	});
-	
-	fs.exists(outputFileName, function(exists) {
-		  if (exists) {
-			  fs.close(outputFileName);
-		  } 
 	});
 });
