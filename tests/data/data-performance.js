@@ -16,9 +16,9 @@ var test = require('tap').test,
  * 	Testing Parameters
  */
 var n = 1,
-	testFileName = '/tests/data.js',
-	sampleFile = '../samples/reuters/reut2-000.sgm',
-	outputFileName = '../logs/tests/data-storelsh.txt';
+	testFileName = '/tests/data/data-performance.js',
+	sampleFile = '../../samples/reuters/reut2-000.sgm',
+	outputFileName = '../../logs/tests/data-storelsh.txt';
 
 /**
  *  Logger
@@ -37,7 +37,6 @@ var logger = new (winston.Logger)({
  */
 
 var	startTime = null,
-	endTime = null,
 	elapsedTime = null,
 	recvAck = 0;
 	
@@ -47,9 +46,7 @@ var testAsync = function(error){
 	 } else {
 	    console.log('Data saved successfully.');
 	    
-	    endTime = new Date().getTime();
-		
-		elapsedTime = endTime - startTime;
+	    elapsedTime = process.hrtime(startTime);
 		
 		logger.log('info',
 				{
@@ -58,7 +55,7 @@ var testAsync = function(error){
 					description:'Received Band Stored Ack',
 					textId:recvAck,
 					connectionType:'recv',
-					elapsedTime:elapsedTime,
+					elapsedTime:elapsedTime[1],
 					timeType:'ms'
 				}
 			);
@@ -73,7 +70,7 @@ test('Network Latency for Saving '+n+' Text Content',function(t){
 	
 	fs.exists(outputFileName, function(exists) {
 		  if (exists) {
-			  fs.unlink();
+			  fs.unlink(outputFileName);
 		  } 
 	});	
 	
@@ -111,7 +108,7 @@ test('Network Latency for Saving '+n+' Text Content',function(t){
 					var minHashSignatures = textMod.minHashSignaturesGen(registerShinglesFing);
 					
 					/* Register the Signature into the Registry*/
-					startTime = new Date().getTime();
+					startTime = process.hrtime();
 					
 					dataMod.storeLsh(minHashSignatures[0],testAsync);
 				}
@@ -139,9 +136,9 @@ test('Network Latency for Saving '+n+' Text Content',function(t){
  * 	Testing Parameters
  */
 var n = 10,
-	testFileName = '/tests/data.js',
-	sampleFile = '../samples/reuters/reut2-000.sgm',
-	outputFileName = '../logs/tests/data-searchlsh.txt';
+	testFileName = '/tests/data-performance.js',
+	sampleFile = '../../samples/reuters/reut2-000.sgm',
+	outputFileName = '../../logs/tests/data-searchlsh.txt';
 
 /**
  *  Logger
@@ -186,7 +183,7 @@ test('Network Latency Searching Signatures',function(t){
 
 	fs.exists(outputFileName, function(exists) {
 		  if (exists) {
-			  fs.unlink();
+			  fs.unlink(outputFileName);
 		  } 
 		});
 	
