@@ -117,3 +117,14 @@ test('Network Latency for Saving '+n+' Text Content',function(t){
 	
 	t.end();
 });
+
+
+/**
+ *  Time to Received Search Queries
+ */
+test('Network Latency for Saving '+n+' Text Content',function(t){
+
+
+
+});
+}
