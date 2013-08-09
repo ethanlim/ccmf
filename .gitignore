@@ -1,3 +1,5 @@
 /lib/compiler.jar
 
 node_modules/bin/
+
+/samples
