@@ -7,10 +7,9 @@ var test = require('tap').test,
  * 	Testing Parameters
  */
 var n = 1000,
-	testFileName = '/tests/data.js',
-	outputFileName = '../logs/tests/shingles.txt',
-	testName = '';
-
+	testFileName = '/tests/shingles.js',
+	sampleFile = '../samples/reuters/reut2-000.sgm',
+	outputFileName = '../logs/tests/shingles.txt';
 
 /**
  *  Logger
@@ -29,15 +28,16 @@ var logger = new (winston.Logger)({
  */
 
 var	startTime = null,
-	endTime = null,
 	elapsedTime = null;
 
 /**
- *  Test Cases 
+ *  Generate Test Cases  
  */
-test(testName,function(t){
+test('Time taken for extracting shingles',function(t){
 	
-	fs.readFile('../samples/reuters/reut2-000.sgm',function read(err,data){
+	fs.unlink(outputFileName);	
+	
+	fs.readFile(sampleFile,function read(err,data){
 		if(err){
 			console.log('Error Reading File : '+err);
 		}
@@ -46,54 +46,51 @@ test(testName,function(t){
 			textContent = content.toString(),
 			registeringText = '',
 			bodyIdx = 0,
-			max = 0,
-			rand
+			max = 0;
 		
 			bodyTextArr  = textContent.match(/<\s*BODY[^>]*>([^<]*)<\s*\/\s*BODY\s*>/g);
 			
 			if(bodyTextArr!==null){
 				
 				max=bodyTextArr.length;
+				if(n<max){
+					max = n;
+				}
 								
 				for(bodyIdx=0;bodyIdx<max;bodyIdx++){
 					
 					registeringText = bodyTextArr[bodyIdx].replace(/(<([^>]+)>)/ig,"");
 					
 					var textMod = ccmf.ccmf.Text.create();
-					var dataMod = ccmf.ccmf.Data.create();
 					
 					var articleNo = Math.floor((Math.random()*(max-1))+0);
 					
-					logger.log('info','Shingles Extraction for Article No : '+ articleNo);
-					
 					var articleWordCount = registeringText.split('').length;
 					
-					startTime = new Date().getTime();
+					startTime = process.hrtime();
 					
-					var registeringTextShingles = textMod.removedStopWordShingles(registeringText,9);				
-					
-					endTime = new Date().getTime();
-						
-					elapsedTime = endTime - startTime;
+					textMod.removedStopWordShingles(registeringText,9);				
+											
+					elapsedTime = process.hrtime(startTime);
 						
 					logger.log('info',
-							testName,
 							{
 								testFile:testFileName,
 								purpose:'shingles-extraction-speed',
 								description:'Shingles Extraction Speed',
 								textId:articleNo,
 								connectionType:'none',
-								elapsedTime:elapsedTime,
-								timeType:'ms',
+								elapsedTime:elapsedTime[1],
+								timeType:'ns',
 								textLen:articleWordCount
 							}
 					);
+					
 				}
+				console.log("Number of Articles : "+max);
 			}else{
 				console.log("No String Found");
 			}
-			
 			t.end();
 		}
 	});
