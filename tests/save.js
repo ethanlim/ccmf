@@ -11,9 +11,9 @@ var test = require('tap').test,
 /**
  * 	Testing Parameters
  */
-var n = 1000,
+var n = 10,
 	testFileName = '/tests/data.js',
-	testName = '';
+	testName = 'Network Latency for Saving '+n+' Text Content,';
 
 /**
  *  Logger
@@ -31,8 +31,7 @@ var logger = new (winston.Logger)({
  *  Prepare Test Situation 
  */
 
-var testName = 'Network Latency for Saving '+n+' Text Content,',
-	startTime = null,
+var	startTime = null,
 	endTime = null,
 	elapsedTime = null,
 	recvAck = 0;
