@@ -143,7 +143,6 @@ module.exports.minhash = {
 						numOfArticles = 0,
 						bodyTextArr = textContent.match(/<\s*BODY[^>]*>([^<]*)<\s*\/\s*BODY\s*>/g),
 						textMod = null,
-						articleNo = 0,
 						articleWordCount = 0,
 						registeringTextShingles = null,
 						registerShinglesFing = null;
@@ -157,8 +156,6 @@ module.exports.minhash = {
 								registeringText = bodyTextArr[bodyIdx].replace(/(<([^>]+)>)/ig,"");
 								
 								textMod = ccmf.ccmf.Text.create();
-								
-								articleNo = Math.floor((Math.random()*(numOfArticles-1))+0);
 								
 								articleWordCount = registeringText.split('').length;
 									
@@ -177,7 +174,7 @@ module.exports.minhash = {
 											testFile:testFileName,
 											purpose:'minhash-signature',
 											description:'Minhash Signature Generation',
-											textId:articleNo,
+											textId:bodyIdx,
 											connectionType:'none',
 											elapsedTime:elapsedTime[1],
 											timeType:'ns',
@@ -235,7 +232,6 @@ module.exports.lsh = {
 						bodyIdx = 0,
 						numOfArticles = 0,
 						textMod = null,
-						articleNo = 0,
 						articleWordCount = 0,
 						registeringTextShingles = null,
 						registerShinglesFing = null
@@ -252,8 +248,6 @@ module.exports.lsh = {
 								registeringText = bodyTextArr[bodyIdx].replace(/(<([^>]+)>)/ig,"");
 								
 								textMod = ccmf.ccmf.Text.create();
-								
-								articleNo = Math.floor((Math.random()*(numOfArticles-1))+0);
 								
 								articleWordCount = registeringText.split('').length;
 									
@@ -274,7 +268,7 @@ module.exports.lsh = {
 											testFile:testFileName,
 											purpose:'lsh-time',
 											description:'Speed of LSH execution',
-											textId:articleNo,
+											textId:bodyIdx,
 											connectionType:'none',
 											elapsedTime:elapsedTime[1],
 											timeType:'ns',
