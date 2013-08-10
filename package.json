@@ -15,7 +15,7 @@
 	    "url": "https://github.com/firebase/firebase-node.git"
   },
   "devDependencies": {
-    "tap": "*",
+    "nodeunit":"*",
     "winston":"*"
   },
   "bugs": {
