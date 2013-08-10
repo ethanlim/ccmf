@@ -13,6 +13,29 @@ var n = 1,
 	elapsedTime = null,
 	recvAck = 0;
 
+var testAsync = function(error){
+	if (error) {
+	    console.log('Data could not be saved.' + error);
+	 } else {
+	    console.log('Data saved successfully.');
+	    
+	    elapsedTime = process.hrtime(startTime);
+		
+		logger.log('info',
+				{
+					testFile:testFileName,
+					purpose:'networklatency-ack',
+					description:'Received Band Stored Ack',
+					textId:recvAck,
+					connectionType:'recv',
+					elapsedTime:elapsedTime[1],
+					timeType:'ms'
+				}
+			);
+		
+	 }
+};
+
 /**
  *  Logger
  */
@@ -25,7 +48,7 @@ var logger = new (winston.Logger)({
     ]
 });
 
-module.exports = {
+module.exports.data = {
 		 setUp: function (callback) {
 				fs.exists(outputFileName, function(exists) {
 					  if (exists) {
@@ -79,5 +102,49 @@ module.exports = {
 					}
 				});
 			 	test.done();
+		 },
+		 search:function(test){
+			 fs.readFile(sampleFile,function read(err,data){
+					if(err){
+						console.log('Error Reading File : '+err);
+					}
+					else{
+						var content = data,
+						textContent = content.toString(),
+						registeringText = '',
+						bodyIdx = 0,
+						max = 0,
+					
+						bodyTextArr  = textContent.match(/<\s*BODY[^>]*>([^<]*)<\s*\/\s*BODY\s*>/g);
+						
+						if(bodyTextArr!==null){
+							
+							max=bodyTextArr.length;
+							if(n<max){
+								max = n;
+							}
+							
+							for(bodyIdx=0;bodyIdx<max;bodyIdx++){
+								
+								registeringText = bodyTextArr[bodyIdx].replace(/(<([^>]+)>)/ig,"");
+								
+								var textMod = ccmf.ccmf.Text.create();
+								var dataMod = ccmf.ccmf.Data.create();
+								
+								var registeringTextShingles = textMod.removedStopWordShingles(registeringText,9);
+								
+								var registerShinglesFing = textMod.shinglesFingerprintConv(registeringTextShingles);
+								
+								var minHashSignatures = textMod.minHashSignaturesGen(registerShinglesFing);
+								
+								startTime = process.hrtime();
+								
+								dataMod.conductLsh(minHashSignatures[0],testSearch);
+							}
+						}else{
+							console.log("No String Found");
+						}
+					}
+			 });
 		 }
 };
