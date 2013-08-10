@@ -1,6 +1,5 @@
 /lib/compiler.jar
 
-node_modules/bin/
-
+/node_modules
 /samples
 /logs
