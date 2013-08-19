@@ -36,7 +36,9 @@ function Analyzer(){
 			    console.log('Analysis Type : '+jsonEntry.purpose);
 			    console.log('Num of Text : '+numOfText);
 			    console.log('Total Time : '+totalTimeTaken);
-			    console.log('Mean Time :'+(totalTimeTaken/numOfText)/1000000000);
+			    console.log('Mean Time (ns) :'+(totalTimeTaken/numOfText));
+			    console.log('Mean Time (ms) :'+(totalTimeTaken/numOfText)/1000000);
+			    console.log('Mean Time (s) :'+(totalTimeTaken/numOfText)/1000000000);
 			});
 		}
 	};
