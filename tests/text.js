@@ -5,8 +5,7 @@ var ccmf = require('ccmf'),
 /**
  * 	Testing Parameters
  */
-var n = 1000,
-	startTime = null,
+var	startTime = null,
 	elapsedTime = null,
 	testFileName = '/tests/text.js' ;
 
@@ -18,7 +17,8 @@ winston.profile('test');
 module.exports.shingles = {
 		 setUp: function (callback) {
 				this.sampleFile = '../samples/reuters/reut2-000.sgm';
-			 	outputFileName = '../logs/tests/shingles.log';
+			 	
+				outputFileName = '../logs/tests/shingles.log';
 				
 			    this.logger = new (winston.Logger)({
 			        transports: [
@@ -234,7 +234,7 @@ module.exports.lsh = {
 						textMod = null,
 						articleWordCount = 0,
 						registeringTextShingles = null,
-						registerShinglesFing = null
+						registerShinglesFing = null,
 						signatures = null;
 					
 						bodyTextArr  = textContent.match(/<\s*BODY[^>]*>([^<]*)<\s*\/\s*BODY\s*>/g);
@@ -259,7 +259,7 @@ module.exports.lsh = {
 								
 								startTime = process.hrtime();
 								
-								textMod.LSH(signatures[0]);
+								textMod.LSH(signatures[0],10);
 														
 								elapsedTime = process.hrtime(startTime);
 									
