@@ -259,7 +259,7 @@ module.exports.lsh = {
 								
 								startTime = process.hrtime();
 								
-								textMod.LSH(signatures[0],10);
+								textMod.LSH(signatures[0],5);
 														
 								elapsedTime = process.hrtime(startTime);
 									
