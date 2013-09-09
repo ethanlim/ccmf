@@ -44,7 +44,12 @@ winston.profile('test');
 var logger = new (winston.Logger)({
     transports: [
       new (winston.transports.Console)(),
-      new (winston.transports.File)({filename: outputFileName })
+      new (winston.transports.File)(
+    		  {
+    			  filename: outputFileName,
+    			  handleExceptions: true
+    		  }
+      )
     ]
 });
 
@@ -132,9 +137,7 @@ module.exports.data = {
 								var dataMod = ccmf.ccmf.Data.create();
 								
 								var registeringTextShingles = textMod.removedStopWordShingles(registeringText,9);
-								
 								var registerShinglesFing = textMod.shinglesFingerprintConv(registeringTextShingles);
-								
 								var minHashSignatures = textMod.minHashSignaturesGen(registerShinglesFing);
 								
 								startTime = process.hrtime();
@@ -146,5 +149,10 @@ module.exports.data = {
 						}
 					}
 			 });
+		 },
+		 tearDown: function (callback) {
+		        console.log("Data Test Completed");
+			 	// clean up
+		        callback();
 		 }
 };
