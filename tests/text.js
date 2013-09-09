@@ -7,7 +7,7 @@ var ccmf = require('ccmf'),
  */
 var	startTime = null,
 	elapsedTime = null,
-	testFileName = '/tests/text.js' ;
+	testFileName = __filename;
 
 /**
  *  Logger
@@ -17,30 +17,30 @@ winston.profile('test');
 module.exports.shingles = {
 		 setUp: function (callback) {
 				this.sampleFile = '../samples/reuters/reut2-000.sgm';
-			 	
-				outputFileName = '../logs/tests/shingles.log';
-				
+				var outputFileName = '../logs/tests/shingles.log';
+
 			    this.logger = new (winston.Logger)({
 			        transports: [
 			                  	new (winston.transports.Console)(),
-			                  	new (winston.transports.File)({filename: outputFileName })
+			                  	new (winston.transports.File)(
+			                  		{
+			                  		 filename:outputFileName,
+			                  		 handleExceptions: true
+			                  		}
+			                  	)
 			                  ]
 			    });
 			    
 				fs.exists(outputFileName, function(exists) {
 					  if (exists) {
 						  fs.unlink(outputFileName);
-					  } 
+						  console.log("Removed previous test output file");
+					  }
 				});	
 				
 		        callback();
 		 },
-		 tearDown: function (callback) {
-		        // clean up
-		        callback();
-		 },
 		 extractionSpeed: function (test) {
-			 
 			 /* Remove the console logger */
 			 var logger = this.logger;
 			 logger.remove(winston.transports.Console);
@@ -77,7 +77,7 @@ module.exports.shingles = {
 								textMod.removedStopWordShingles(registeringText,9);				
 														
 								elapsedTime = process.hrtime(startTime);
-									
+								
 								logger.log('info',
 										{
 											testFile:testFileName,
@@ -91,20 +91,25 @@ module.exports.shingles = {
 										}
 								);
 							}
-							console.log("Number of Articles : "+numOfArticles);
 						}else{
 							console.log("No String Found");
 						}
+						// Call the teardown callback
+				        test.done();
 					}
-				});
-		        test.done();
+			 });
+		 },
+		 tearDown: function (callback) {
+		        console.log("Shingles Extraction Test Completed");
+			 	// clean up
+		        callback();
 		 }
 };
 
 module.exports.minhash = {
 		 setUp: function (callback) {
 			this.sampleFile = '../samples/reuters/reut2-000.sgm';
-		 	outputFileName = '../logs/tests/minhash.log';
+		 	var outputFileName = '../logs/tests/minhash.log';
 			
 		    this.logger = new (winston.Logger)({
 		        transports: [
@@ -116,14 +121,11 @@ module.exports.minhash = {
 			fs.exists(outputFileName, function(exists) {
 				  if (exists) {
 					  fs.unlink(outputFileName);
+					  console.log("Removed previous test output file");
 				  } 
 			});	
 			
 	        callback();
-		 },
-		 tearDown: function (callback) {
-		        // clean up
-			 callback();
 		 },
 		 constructingSpeed: function (test) {
 			 
@@ -183,20 +185,25 @@ module.exports.minhash = {
 								);
 								
 							}
-							console.log("Number of Articles : "+numOfArticles);
 						}else{
 							console.log("No String Found");
 						}
+						test.done();
 					}
 				});
-			 	test.done();
-		 }
+			 	
+		 },
+		 tearDown: function (callback) {
+			 console.log("Minhash Computation Test Completed");
+			 // clean up
+			 callback();
+		 },
 };
 
 module.exports.lsh = {
 		setUp: function (callback) {
 			this.sampleFile = '../samples/reuters/reut2-000.sgm';
-		 	outputFileName = '../logs/tests/lsh.log';
+		 	var outputFileName = '../logs/tests/lsh.log';
 			
 		    this.logger = new (winston.Logger)({
 		        transports: [
@@ -208,14 +215,11 @@ module.exports.lsh = {
 			fs.exists(outputFileName, function(exists) {
 				  if (exists) {
 					  fs.unlink(outputFileName);
+					  console.log("Removed previous test output file");
 				  } 
 			});	
 			
 	        callback();
-		 },
-		 tearDown: function (callback) {
-		     // clean up
-			 callback();
 		 },
 		 constructingSpeed: function (test){
 			 
@@ -280,8 +284,13 @@ module.exports.lsh = {
 						}else{
 							console.log("No String Found");
 						}
+						test.done();
 					}
 				});
-			 test.done();
+		 },
+		 tearDown: function (callback) {
+			 console.log("LSH Computation Test Completed");
+		     // clean up
+			 callback();
 		 }
 };

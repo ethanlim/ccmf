@@ -19,7 +19,8 @@ function Analyzer(){
 		for(logFileNum in files){
 			
 			fs.readFile(pathToLogFiles+files[logFileNum], function(err, data) {
-			    if(err) throw err;
+			    
+				if(err) throw err;
 			    
 			    var textArray = data.toString().split("\n"),
 			    numOfText = textArray.length,
