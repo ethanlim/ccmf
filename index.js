@@ -1,5 +1,5 @@
 /**
- *  Simply load the file from system
+ *  Simply load the javascript file into a node module
  */
 
 var fs = require('fs');
