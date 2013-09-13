@@ -1,4 +1,4 @@
-var ccmf = require('ccmf'),
+var ccmf = require('C:\users\ethanlim\document\project\ccmf-node\node_modules\ccmf/lib/build/ccmf.js'),
 	fs = require('fs'),
 	winston = require('winston');
 
