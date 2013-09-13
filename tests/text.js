@@ -1,4 +1,4 @@
-var ccmf = require('C:\users\ethanlim\document\project\ccmf-node\node_modules\ccmf/lib/build/ccmf.js'),
+var ccmf = require('../index.js'),	//Reference the exported ccmf library
 	fs = require('fs'),
 	winston = require('winston');
 

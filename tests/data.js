@@ -1,4 +1,4 @@
-var ccmf = require(__dirname+'/lib/build/ccmf.js'),
+var ccmf = require('../index.js'), //Reference the exported ccmf library
 	fs = require('fs'),
 	winston = require('winston');
 
@@ -149,10 +149,11 @@ module.exports.data = {
 						}
 					}
 			 });
+			 test.done();
 		 },
 		 tearDown: function (callback) {
-		        console.log("Data Test Completed");
-			 	// clean up
-		        callback();
+	        console.log("Data Test Completed");
+		 	// clean up
+	        callback();
 		 }
 };
