@@ -1,4 +1,6 @@
 /lib/compiler.jar
+.project
+.settings
 
 /node_modules
 /samples
