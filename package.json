@@ -8,15 +8,15 @@
   },
   "main" : "./index.js",
   "dependencies": {
-    "firebase": "*"
+    "firebase": "0.6.3"
   },
   "repository": {
 	    "type": "git",
-	    "url": "https://github.com/firebase/firebase-node.git"
+	    "url": "https://github.com/ethanlim/ccmf.git"
   },
   "devDependencies": {
-    "nodeunit":"*",
-    "winston":"*"
+    "nodeunit"	:"0.8.1",
+    "winston"	:"0.7.2"
   },
   "bugs": {
     "url": "https://github.com/ethanlim/ccmf/issues"
