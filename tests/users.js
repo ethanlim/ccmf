@@ -114,7 +114,7 @@ module.exports.articles = {
 				}
 			});
 			
-			console.log("Search a non-registered article");
+			console.log("Search non-registered article");
 			
 			var nonRegisteredTextShingles = textMod.removedStopWordShingles(deletingTexts[articlesCount-1],9);
 			var nonRegisteredShinglesFing = textMod.shinglesFingerprintConv(nonRegisteredTextShingles);
@@ -137,8 +137,6 @@ module.exports.articles = {
 		deletion:function(test){
 
 			/* Remove all the minhash signatures that was registered */ 
-			
-			console.log("Deleting testing registered articles from storage");
 			
 			var storedArticles = deletingTexts.length;
 			
@@ -173,7 +171,7 @@ module.exports.articles = {
 			test.done();
 		},
 		tearDown:function(callback){
-			
+			console.log("Wait for Async Results");
 			callback();
 		}
 };
