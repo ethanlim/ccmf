@@ -9,7 +9,8 @@
   "main" : "./index.js",
   "dependencies": {
     "firebase": "0.6.3",
-    "cheerio" : "0.12.2"
+    "cheerio" : "0.12.2",
+    "request" : "*"
   },
   "repository": {
 	    "type": "git",
