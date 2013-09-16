@@ -138,6 +138,8 @@ module.exports.articles = {
 
 			/* Remove all the minhash signatures that was registered */ 
 			
+			console.log("Deleting testing registered articles from storage");
+			
 			var storedArticles = deletingTexts.length;
 			
 			for(var articles=0;articles<storedArticles;articles++){
