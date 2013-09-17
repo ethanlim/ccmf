@@ -10,8 +10,7 @@ CCMF library is an easy to use javascript client/node library that assist copyri
 *   [Overview](#overview)
     *   [Philosophy](#philosophy)
     *   [Requirements](#requirements)
-    *   [Installation](#installation)
-    	* C  
+    *   [Installation](#installation)  
     *   [Getting Started](#gettingStarted)
 *   [Text Module](#textModule)
     *   [General](#textModule-general)
