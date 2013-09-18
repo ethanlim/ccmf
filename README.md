@@ -56,19 +56,20 @@ To register and submit content, users have to register with Creative Commons her
 
 1. Add CCMF to your package.json
 
-
-"dependencies": {
-	"express": "*",
-	"jade": "*",
-	"firebase":"*",
-	"ccmf":"git://github.com/ethanlim/ccmf.git#master"
-},
-
+								```javascript
+								"dependencies": {
+									"express": "*",
+									"jade": "*",
+									"firebase":"*",
+									"ccmf":"git://github.com/ethanlim/ccmf.git#master"
+								},
+								```
 
 2. Conduct a NPM install
 
-node npm install
-
+								```javascript
+								node npm install
+								```
 
 <h3 id="gettingStarted">Getting Started</h3>
 
