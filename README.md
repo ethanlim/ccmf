@@ -51,20 +51,7 @@ To register and submit content, users have to register with Creative Commons her
 
 <h4 id="browserInstall">Client Browser</h4>
 
-
 <h4 id="nodeInstall">Node Module</h4>
-
-Add CCMF to your package.json
-
-
-"dependencies": {
-	"ccmf":"git://github.com/ethanlim/ccmf.git#master"
-},
-
-
-Conduct a NPM install
-
-node npm install
 
 <h3 id="gettingStarted">Getting Started</h3>
 
