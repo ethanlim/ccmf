@@ -11,6 +11,8 @@ CCMF library is an easy to use javascript client/node library that assist copyri
     *   [Philosophy](#philosophy)
     *   [Requirements](#requirements)
     *   [Installation](#installation)  
+    	* [Client Browser](#browserInstall)
+    	* [Node Module](#nodeInstall)
     *   [Getting Started](#gettingStarted)
 *   [Text Module](#textModule)
     *   [General](#textModule-general)
@@ -28,6 +30,7 @@ CCMF library is an easy to use javascript client/node library that assist copyri
     *   [Theoretical Readings](#theoreticalReading)
 
 [1]: http://creativecommons.org/ "Creative Commons"
+[2]: http://semver.org/ "Semantic Versioning"
 
 * * * 
 <h2 id="overview">Overview</h2>
@@ -46,6 +49,24 @@ To register and submit content, users have to register with Creative Commons her
 
 <h3 id="installation">Installation<h3>
 
+<h4 id="browserInstall">Client Browser</h4>
+
+
+<h4 id="nodeInstall">Node Module</h4>
+
+1. Add CCMF to your package.json
+
+	    "dependencies": {
+		    "express": "*",
+		    "jade": "*",
+		    "firebase":"*",
+		    "ccmf":"git://github.com/ethanlim/ccmf.git#master"
+	    },
+
+2. Conduct a NPM install
+
+		node npm install
+
 <h3 id="gettingStarted">Getting Started</h3>
 
 <h2 id="textModule">Text Module</h2>
@@ -62,11 +83,26 @@ To register and submit content, users have to register with Creative Commons her
 
 <h4 id="textModule-minhash">MinHash</h4>
 
-<h4 id="textModule-lsh">Locality-Sensitive Hashing</h4>
+<h4 id="textModule-lsh">Locality-Sensitive Hashing (LSH)</h4>
 
 <h2 id="feature&bugs">Feature Request and Bug Fixes</h2>
 
 <h2 id="versioning">Versioning</h2>
+
+Built on the rationale of providing maximum backward compatibility,CCMF adopts the [Semantic Versioning][2] v.2.0.0 guidelines.
+
+Releases will be numbered with the following format:
+
+`<major>.<minor>.<patch>`
+
+eg. **v1.2.12**
+represents the 1st major, 2nd minor and the 12th patch.
+
+And constructed with the following guidelines:
+
+- Breaking backward compatibility bumps the major (and resets the minor and patch)
+- New additions without breaking backward compatibility bumps the minor (and resets the patch)
+- Bug fixes and misc changes bumps the patch
 
 <h2 id="authors">Authors</h2>
 
