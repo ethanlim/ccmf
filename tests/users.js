@@ -8,7 +8,30 @@ var deletingTexts = [],
 	domain = "http://www.wikipedia.org",
 	wikiArticlePaths = [],
 	articlesCount=0,
-	storedArticlesCount = 0;
+	storedArticlesCount = 0,
+	resultCallback = function(results){
+		
+		if(results.count!=0){
+			
+			var resultSets = results['sets'],
+			metadata = null,
+			author = null,
+			set = null;
+		
+			for(var result=0;result<results.count;result++){
+				
+				set = JSON.parse(resultSets[result]);
+				
+				metadata = set['metadata'];
+				author = metadata['author'];
+				
+				console.log('Sig :'+set['sig'].toString().substring(0,30)+' Author : '+author['first']);
+			}
+		}
+		else{
+				console.log('No Similar Signature Found');
+		}
+	};
 
 module.exports.articles = {
 		
@@ -108,11 +131,7 @@ module.exports.articles = {
 			
 			var minHashSignature = textMod.minHashSignaturesGen(signature); 
 			
-			dataMod.conductLsh(minHashSignature,function(snapshot){
-				if(snapshot.val()!=null){
-					console.log("Found Signature in Band :" + snapshot.ref());
-				}
-			});
+			dataMod.conductLsh(minHashSignature,resultCallback);
 			
 			console.log("Search non-registered article");
 			
@@ -124,13 +143,7 @@ module.exports.articles = {
 			
 			var nonRegisteredMinHashSignature = textMod.minHashSignaturesGen(signature); 
 			
-			dataMod.conductLsh(nonRegisteredMinHashSignature,function(snapshot){
-				if(snapshot.val()!=null){
-					console.log("Found Signature in Band :" + snapshot.ref());
-				}else{
-					console.log("Not Found");
-				}
-			});
+			dataMod.conductLsh(nonRegisteredMinHashSignature,resultCallback);
 			
 			test.done();
 		},
