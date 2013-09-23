@@ -51,7 +51,7 @@ To register and submit content, users have to register [an account](http://ccmf.
 
 <h4 id="browserInstall">Client Browser</h4>
 
-```JavaScript
+```HTML
 <script src='https://raw.github.com/ethanlim/ccmf/master/lib/build/ccmf.js'></script>
 ```
 
@@ -67,7 +67,7 @@ To register and submit content, users have to register [an account](http://ccmf.
 
 <h3 id="textModule-search">Search</h3>
 
-<h3 id="textModule-submodules">Submodule</h3>
+<h3 id="textModule-submodules">Inner Workings</h3>
 
 <h4 id="textModule-shingles">Shingles</h4>
 
@@ -76,6 +76,8 @@ To register and submit content, users have to register [an account](http://ccmf.
 <h4 id="textModule-lsh">Locality-Sensitive Hashing (LSH)</h4>
 
 <h2 id="feature&bugs">Feature Request and Bug Fixes</h2>
+
+Submit all feature request and bug reports [here](https://github.com/ethanlim/ccmf/issues).
 
 <h2 id="versioning">Versioning</h2>
 
