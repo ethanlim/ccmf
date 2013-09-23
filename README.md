@@ -11,20 +11,22 @@ CCMF library is an easy to use javascript client/node library that assist copyri
     *   [Philosophy](#philosophy)
     *   [Requirements](#requirements)
     *   [Installation](#installation)  
-    	* [Client Browser](#browserInstall)
-    	* [Node Module](#nodeInstall)
-    *   [Getting Started](#gettingStarted)
-*   [Text Module](#textModule)
-    *   [General](#textModule-general)
-	* [Shingles](#textModule-shingles)
-	* [MinHashing](#textModule-minhash)
-	* [Locality-Sensitive Hashing (LSH)](#textModule-lsh)
-*	[Feature Request and Bug Fixes](#feature&bugs)
+    	* [Client Browser](#client-browser)
+    	* [Node Module](#node-module)
+    *   [Quick Start](#quick-start)
+    	* [Register](#register)
+    	* [Search](#search) 
+*   [Text Module](#text-module)
+    * [General](#general)
+	* [Shingles](#shingles)
+	* [MinHashing](#minhash)
+	* [Locality-Sensitive Hashing (LSH)](#locality-sensitive-hashing-lsh)
+*	[Feature Request and Bug Fixes](#feature-request-and-bug-fixes)
 *	[Versioning](#versioning)
 *	[Authors](#authors)
-*   [Miscellaneous](#misc)
-    *   [Copyright & License](#copyright&license)
-    *   [Theoretical Readings](#theoreticalReading)
+*   [Miscellaneous](#miscellaneous)
+    *   [Copyright & License](#copyright--license)
+    *   [Theoretical Readings](#theoretical-reading)
 
 [1]: http://creativecommons.org/ "Creative Commons"
 [2]: http://semver.org/ "Semantic Versioning"
@@ -64,7 +66,7 @@ Insert ccmf into package.json and conduct a <code>npm install</code>:
 }
 ```
 
-###Quick Started
+###Quick Start
 
 Create a text module object
  
