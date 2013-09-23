@@ -72,7 +72,7 @@ Insert ccmf into package.json and conduct a <code>npm install</code>:
 Create a text module object
  
 ```javascript
-var textMod = ccmf.ccmf.Text.create();
+var textMod = ccmf.Text.create();
 ```
 
 Insert your credentials into a <code>metadata</code> object
@@ -100,10 +100,10 @@ textMod.register(
 );
 ```
 
-An example of a callback function
+An example of a register callback function
 
 ```javascript
-storeCallback = function(error){
+var storeCallback = function(error){
 					if(error===null){
 						jQuery('#result').text("Text registered with creative commons");
 					}
@@ -114,6 +114,47 @@ storeCallback = function(error){
 ```
 
 ####Search
+
+Execute the search method to search for similar textual content to yours.
+
+```javascript
+textMod.search(
+				textToBeSearched,		//Text that you are using to search for similar texts
+				{k:9},					//shingles length : more on this below
+				null,					//reserved for future usage
+				resultCallback			//attach the callback that would execute once results are ready
+			  );
+```
+
+The callback for search is slightly different as it returns the result of your search
+
+```javascript
+resultCallback = function(results){
+				
+					//If there are any results
+					if(results.count!=0){
+						
+						var resultSets = results['sets'],
+						metadata = null,
+						author = null,
+						set = null;
+					
+						for(var result=0;result<results.count;result++){
+							
+							set = JSON.parse(resultSets[result]);	//Signature of the similar text
+							
+							metadata = set['metadata'];				//Get the metadata object (exactly as above)
+			
+							author = metadata['author']; 			//Get the author's detail
+							
+							console.log('Signature :'+set['sig'].toString().substring(0,30) +' Author : '+author['first']);
+						}
+					}
+					else{
+							console.log('No Similar Signature Found');
+					}
+				};
+```
 
 ##Text Module
 
