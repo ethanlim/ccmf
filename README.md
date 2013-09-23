@@ -33,9 +33,9 @@ CCMF library is an easy to use javascript client/node library that assist copyri
 [2]: http://semver.org/ "Semantic Versioning"
 
 * * * 
-<h2 id="overview">Overview</h2>
+##Overview
 
-<h3 id="philosophy">Philosophy</h3>
+###Philosophy
 
 CCMF is intended to safeguard  copyright owner's intellectual properties, by keeping track of the appearance of their content on the web. Eventually, CCMF would notify these owners if their copyright of their content has been violated on the web.
 
@@ -43,19 +43,19 @@ To facilitate this, CCMF would require a signature of author's original content.
 
 Another key idea is that the all computations can be accomplished via the client's browser or via the Node.JS environment. There is no centralised server requirement to use this library.
 
-<h3 id="requirements">Requirements</h3>
+###Requirements
 
 To register and submit content, users have to register [an account](http://ccmf.ethanlim.net/users/signup) with Creative Commons.
 
-<h3 id="installation">Installation<h3>
+###Installation
 
-<h4 id="browserInstall">Client Browser</h4>
+####Client Browser
 
 Add ccmf library into your page:
 
 	<script src='https://raw.github.com/ethanlim/ccmf/master/lib/build/ccmf.js'></script>
 
-<h4 id="nodeInstall">Node Module</h4>
+####Node Module
 
 Insert ccmf into package.json
 
@@ -63,29 +63,29 @@ Insert ccmf into package.json
 	  "ccmf":"git://github.com/ethanlim/ccmf.git#master"
 	},
 
-<h3 id="gettingStarted">Getting Started</h3>
+####Getting Started
 
-<h2 id="textModule">Text Module</h2>
+##Text Module
 
-<h3 id="textModule-general">General</h3>
+###General
 
-<h3 id="textModule-register">Register</h3>
+###Register
 
-<h3 id="textModule-search">Search</h3>
+###Search
 
-<h3 id="textModule-submodules">Inner Workings</h3>
+###Inner Workings
 
-<h4 id="textModule-shingles">Shingles</h4>
+####Shingles
 
-<h4 id="textModule-minhash">MinHash</h4>
+####MinHash
 
-<h4 id="textModule-lsh">Locality-Sensitive Hashing (LSH)</h4>
+####Locality-Sensitive Hashing (LSH)
 
-<h2 id="feature&bugs">Feature Request and Bug Fixes</h2>
+##Feature Request and Bug Fixes
 
 Submit all feature request and bug reports [here](https://github.com/ethanlim/ccmf/issues).
 
-<h2 id="versioning">Versioning</h2>
+##Versioning
 
 Built on the rationale of providing maximum backward compatibility,CCMF adopts the [Semantic Versioning][2] v.2.0.0 guidelines.
 
@@ -102,14 +102,14 @@ And constructed with the following guidelines:
 - New additions without breaking backward compatibility bumps the minor (and resets the patch)
 - Bug fixes and misc changes bumps the patch
 
-<h2 id="authors">Authors</h2>
+##Authors
 
 ### Ethan Lim ###
 - GitHub - [https://github.com/ethanlim/](https://github.com/ethanlim/)
 
-<h2 id="misc">Miscellaneous</h2>
+##Miscellaneous
 
-<h3 id="copyright&license">Copyright & License</h3>
+###Copyright & License
 
 The MIT License (MIT)
 
@@ -133,6 +133,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-<h3 id="theoreticalReading">Theoretical Reading</h3> 
+###Theoretical Reading 
 
 - **[Finding Similar Items](http://infolab.stanford.edu/~ullman/mmds.html)**
