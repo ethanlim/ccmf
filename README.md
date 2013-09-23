@@ -216,7 +216,7 @@ var signatures[3] = shinglesFingerprintD;
 Now generate the minhash signatures (they can contain signatures from 1 or more text contents)
 
 ```javascript
-var minHashSignatures = this.minHashSignaturesGen(signature);
+var minHashSignatures = this.minHashSignaturesGen(signatures);
 ```
 
 ####Locality-Sensitive Hashing (LSH)
@@ -243,7 +243,7 @@ callback :function(snapshot){
 Call the method in data module to conduct LSH.
 
 ```javascript
-dataMod.conductLsh(minHashSignature,obj.callback);
+dataMod.conductLsh(minHashSignatures,callback);
 ```
 The callback function would be called and the similar minhash signatures would be returned.
 
