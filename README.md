@@ -16,12 +16,9 @@ CCMF library is an easy to use javascript client/node library that assist copyri
     *   [Getting Started](#gettingStarted)
 *   [Text Module](#textModule)
     *   [General](#textModule-general)
-    *   [Register](#textModule-register)
-    *   [Search](#textModule-search)
-    * 	[Submodules](#textModule-submodules)
-    	* [Shingles](#textModule-shingles)
-    	* [MinHashing](#textModule-minhash)
-    	* [Locality-Sensitive Hashing](#textModule-lsh)
+	* [Shingles](#textModule-shingles)
+	* [MinHashing](#textModule-minhash)
+	* [Locality-Sensitive Hashing (LSH)](#textModule-lsh)
 *	[Feature Request and Bug Fixes](#feature&bugs)
 *	[Versioning](#versioning)
 *	[Authors](#authors)
@@ -67,7 +64,7 @@ Insert ccmf into package.json and conduct a <code>npm install</code>:
 }
 ```
 
-####Quick Started
+###Quick Started
 
 Create a text module object
  
@@ -87,7 +84,7 @@ var metadata = 	{
 		   	 	};
 ```
 
-#####Register
+####Register
 
 Execute the text module's register method to register any text content into Creative Common's database:
 
@@ -113,7 +110,7 @@ var storeCallback = function(error){
 				};
 ```
 
-####Search
+###Search
 
 Execute the search method to search for similar textual content to yours.
 
@@ -131,40 +128,124 @@ The callback for search is slightly different as it returns the result of your s
 ```javascript
 resultCallback = function(results){
 				
-					//If there are any results
-					if(results.count!=0){
-						
-						var resultSets = results['sets'],
-						metadata = null,
-						author = null,
-						set = null;
-					
-						for(var result=0;result<results.count;result++){
-							
-							set = JSON.parse(resultSets[result]);	//Signature of the similar text
-							
-							metadata = set['metadata'];				//Get the metadata object (exactly as above)
+		//If there are any results
+		if(results.count!=0){
 			
-							author = metadata['author']; 			//Get the author's detail
-							
-							console.log('Signature :'+set['sig'].toString().substring(0,30) +' Author : '+author['first']);
-						}
-					}
-					else{
-							console.log('No Similar Signature Found');
-					}
-				};
+			var resultSets = results['sets'],
+			metadata = null,
+			author = null,
+			set = null;
+		
+			for(var result=0;result<results.count;result++){
+				
+				set = JSON.parse(resultSets[result]);	//Signature of the similar text
+				
+				metadata = set['metadata'];				//Get the metadata object (exactly as above)
+
+				author = metadata['author']; 			//Get the author's detail
+				
+				console.log('Signature :'+set['sig'].toString().substring(0,30) +' Author : '+author['first']);
+			}
+		}
+		else{
+				console.log('No Similar Signature Found');
+		}
+	};
 ```
 
 ##Text Module
 
 ###General
 
+The previous <code>search</code> and <code>register</code> methods use 3 components,namely shingles extraction, minhashing and locality-sensitive hashing of the text module. These components dissect the intended textual content into signatures (patterns of integers). These signatures preserve the relationship between that textual content with other contents. The three step process is represented by converting text into shingles, minhashing of shingles and finally conduct lsh. The end product is a signature that can be stored efficiently and be identified as similar to another textual content's signature.
+
+![text-register-image](http://ccmf.s3.amazonaws.com/img/views/texts/doc/general-working1.png)
+
 ####Shingles
+
+Extracting shingles is the act of extracting sub-strings from a given text. Using ccmf's API, shingles can be extracted based on 3 different criteria:
+
+- Fixed Shingles
+
+	The most basic shingles extraction. Simply extract each shingles of substring length **k** from the beginning to the end of text.
+	
+	```javascript
+	var textAShingles = textMod.fixedShinglesWithoutWS(rawText,k);
+	```
+
+- Remove Stop Words Shingles
+
+	Perform a removal of all stop words before conducting Fixed Shingles extraction.
+
+	```javascript
+	var textAShingles = textMod.removedStopWordShingles(rawText,k);
+	```
+
+- Stop More After Stop Word Shingles
+
+	This is a different methodology of extractions. Each shingles are two words after the encountering of a stop word.
+	
+	```javascript
+	var textAShingles = textMod.stopMoreShingles(rawText,k);
+	```
+
+After extracting a set of shingles,they generally occupy more space then actual text themselves. Hence, we should minimize them by hashing them into an array of integers.
+
+``javascript
+var shinglesFingerprintA = textMod.shinglesFingerprintConv(textAShingles);
+```
 
 ####MinHash
 
+Minhash is a technique or process of compressing the amount of data actually needed for comparison while preserving their inherit relationship with each other. 
+
+```javascript
+var signatures[0] = shinglesFingerprintA;
+```
+
+The previous compressed integer array could be loaded into an array of signatures. Use this array of signature if you would like to perform similar text matching solely on the browser. You can add N signatures to this signature array.
+
+``` javascript
+var signatures[1] = shinglesFingerprintB;
+
+var signatures[2] = shinglesFingerprintC;
+
+var signatures[3] = shinglesFingerprintD;
+```
+
+Now generate the minhash signatures (they can contain signatures from 1 or more text contents)
+
+```javascript
+var minHashSignatures = this.minHashSignaturesGen(signature);
+```
+
 ####Locality-Sensitive Hashing (LSH)
+
+To compare each and every pair of minhash signatures to determine the most similar pair would be too inefficient. Normally for this use case, we only need to focus on pairs of signatures that are most likely to be similar and not on every pair. The search functions uses the underlying locality-sensitive hashing (LSH). The art of locality-sensitive hashing is that through multiple hashing of a minhash signature, eventually the similar text content would be hashed to the same location.
+
+The LSH belongs to the data module and so we have to first create the data module object. 
+
+```javascript
+var dataMod = ccmf.Data.create();
+```
+
+Next, create the callback to process the return data.
+
+```javascript
+callback :function(snapshot){	
+   /* Search through each band */	
+   if(snapshot.val()!=null){	
+     var foundSignatureSet = snapshot.val();	
+  }	
+}
+```
+
+Call the method in data module to conduct LSH.
+
+```javascript
+dataMod.conductLsh(minHashSignature,obj.callback);
+```
+The callback function would be called and the similar minhash signatures would be returned.
 
 ##Feature Request and Bug Fixes
 
