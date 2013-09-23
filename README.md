@@ -51,7 +51,7 @@ To register and submit content, users have to register [an account](http://ccmf.
 
 <h4 id="browserInstall">Client Browser</h4>
 
-```javascript
+```JavaScript
 <script src='https://raw.github.com/ethanlim/ccmf/master/lib/build/ccmf.js'></script>
 ```
 
