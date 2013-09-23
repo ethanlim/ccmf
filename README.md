@@ -53,15 +53,19 @@ To register and submit content, users have to register [an account](http://ccmf.
 
 Add ccmf library into your page:
 
-	<script src='https://raw.github.com/ethanlim/ccmf/master/lib/build/ccmf.js'></script>
+```HTML
+<script src='https://raw.github.com/ethanlim/ccmf/master/lib/build/ccmf.js'></script>
+```
 
 ####Node Module
 
 Insert ccmf into package.json
 
-	"dependencies": {
-	  "ccmf":"git://github.com/ethanlim/ccmf.git#master"
-	},
+```javascript
+"dependencies": {
+  "ccmf":"git://github.com/ethanlim/ccmf.git#master"
+},
+```
 
 ####Getting Started
 
