@@ -45,11 +45,13 @@ Another key idea is that the all computations can be accomplished via the client
 
 <h3 id="requirements">Requirements</h3>
 
-To register and submit content, users have to register with Creative Commons here.
+To register and submit content, users have to register [an account](http://ccmf.ethanlim.net/users/signup) with Creative Commons.
 
 <h3 id="installation">Installation<h3>
 
 <h4 id="browserInstall">Client Browser</h4>
+
+	<script src='https://raw.github.com/ethanlim/ccmf/master/lib/build/ccmf.js'></script>
 
 <h4 id="nodeInstall">Node Module</h4>
 
@@ -92,13 +94,16 @@ And constructed with the following guidelines:
 
 <h2 id="authors">Authors</h2>
 
+### Ethan Lim ###
+- GitHub - [https://github.com/ethanlim/](https://github.com/ethanlim/)
+
 <h2 id="misc">Miscellaneous</h2>
 
 <h3 id="copyright&license">Copyright & License</h3>
 
 The MIT License (MIT)
 
-Copyright (c) 2013 [Creative Commons][1]
+Copyright (c) 2013 Lim Zhi Hao
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -120,3 +125,4 @@ THE SOFTWARE.
 
 <h3 id="theoreticalReading">Theoretical Reading</h3> 
 
+- **[Finding Similar Items](http://infolab.stanford.edu/~ullman/mmds.html)**
