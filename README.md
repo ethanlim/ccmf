@@ -191,7 +191,7 @@ Extracting shingles is the act of extracting sub-strings from a given text. Usin
 
 After extracting a set of shingles,they generally occupy more space then actual text themselves. Hence, we should minimize them by hashing them into an array of integers.
 
-``javascript
+```javascript
 var shinglesFingerprintA = textMod.shinglesFingerprintConv(textAShingles);
 ```
 
