@@ -59,25 +59,65 @@ Add ccmf library into your page:
 
 ####Node Module
 
-Insert ccmf into package.json
+Insert ccmf into package.json and conduct a <code>npm install</code>:
 
 ```javascript
 "dependencies": {
   "ccmf":"git://github.com/ethanlim/ccmf.git#master"
-},
+}
 ```
 
-####Getting Started
+####Quick Started
+
+Create a text module object
+ 
+```javascript
+var textMod = ccmf.ccmf.Text.create();
+```
+
+Insert your credentials into a <code>metadata</code> object
+
+```javascript
+var metadata = 	{
+					author:{
+							first:'test',
+							last:'test',
+							email:'test@test.com'
+							}
+		   	 	};
+```
+
+#####Register
+
+Execute the text module's register method to register any text content into Creative Common's database:
+
+```javascript
+textMod.register(	
+	registeringText,			//text content to be registered
+	{k:9},						//shingles length : more on this below
+	metadata,					//attached your metadata constructed above
+	storeCallback				//callback if you would like to perform additional actions once text is stored
+);
+```
+
+An example of a callback function
+
+```javascript
+storeCallback = function(error){
+					if(error===null){
+						jQuery('#result').text("Text registered with creative commons");
+					}
+					else{
+						console.log(error);
+					}
+				};
+```
+
+####Search
 
 ##Text Module
 
 ###General
-
-###Register
-
-###Search
-
-###Inner Workings
 
 ####Shingles
 
